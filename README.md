@@ -118,6 +118,10 @@ npm run build
 npm run dev
 ```
 
+`npm test` runs the PostgreSQL integration suite when `DATABASE_URL` is set. The
+GitHub Actions workflow provides PostgreSQL automatically; without a database the
+integration test is reported as skipped while unit and React tests still run.
+
 Architecture and product decisions are documented in [`spec/README.md`](./spec/README.md).
 
 ## Status

@@ -201,12 +201,16 @@ type Queryable = {
   query(sql: string, params?: readonly unknown[]): Promise<{ rows: unknown[] }>;
 };
 
-export function postgresAdapter(client: Queryable): StorageAdapter {
+type ReleasableQueryable = Queryable & { release(): void };
+type Connectable = Queryable & { connect(): Promise<ReleasableQueryable> };
+
+export function postgresAdapter(client: Queryable | Connectable): StorageAdapter {
   return {
     async insert(entry) {
-      await client.query("BEGIN");
+      const connection = "connect" in client ? await client.connect() : client;
+      await connection.query("BEGIN");
       try {
-        await client.query(
+        await connection.query(
           `insert into activity_entries (
             id, resource_type, resource_id, resource_title, action,
             actor_type, actor_id, actor_name, actor_avatar_url,
@@ -230,7 +234,7 @@ export function postgresAdapter(client: Queryable): StorageAdapter {
         );
 
         for (const [position, change] of (entry.changes ?? []).entries()) {
-          await client.query(
+          await connection.query(
             `insert into activity_changes (
               id, entry_id, position, field, label, before_value, after_value, value_type
             ) values ($1, $2, $3, $4, $5, $6, $7, $8)`,
@@ -247,10 +251,14 @@ export function postgresAdapter(client: Queryable): StorageAdapter {
           );
         }
 
-        await client.query("COMMIT");
+        await connection.query("COMMIT");
       } catch (error) {
-        await client.query("ROLLBACK");
+        await connection.query("ROLLBACK");
         throw toActivityError(error, "STORAGE_FAILURE", "Could not insert activity record");
+      } finally {
+        if ("release" in connection && typeof connection.release === "function") {
+          connection.release();
+        }
       }
     },
     async query(options) {

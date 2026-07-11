@@ -28,7 +28,7 @@ for (const format of ["esm", "cjs"]) {
 
 await build({
   bundle: true,
-  entryPoints: ["src/styles.css"],
+  entryPoints: ["src/activity-panel.css"],
   external: [],
   loader: { ".svg": "dataurl" },
   outfile: "dist/styles.css",
