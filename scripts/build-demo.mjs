@@ -1,8 +1,8 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { build } from "esbuild";
 
-await rm("dist", { force: true, recursive: true });
-await mkdir("dist/assets", { recursive: true });
+await rm("demo-dist", { force: true, recursive: true });
+await mkdir("demo-dist/assets", { recursive: true });
 
 await build({
   bundle: true,
@@ -14,7 +14,7 @@ await build({
     ".svg": "dataurl",
   },
   minify: true,
-  outdir: "dist/assets",
+  outdir: "demo-dist/assets",
   platform: "browser",
   sourcemap: false,
   splitting: false,
@@ -27,4 +27,4 @@ const html = sourceHtml.replace(
   '<link rel="stylesheet" href="/assets/main.css" />\n    <script type="module" src="/assets/main.js"></script>',
 );
 
-await writeFile("dist/index.html", html);
+await writeFile("demo-dist/index.html", html);

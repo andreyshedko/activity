@@ -1,29 +1,80 @@
 {
-  "name": "activity-platform-prototype",
-  "private": true,
+  "name": "@andreyshedko/activity",
+  "description": "Local-first activity history engine and React UI for business resources.",
+  "license": "MIT",
   "version": "0.1.0",
   "type": "module",
+  "sideEffects": [
+    "./dist/styles.css"
+  ],
+  "files": [
+    "dist",
+    "migrations",
+    "README.md"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./react": "./src/react.ts",
-    "./adapters/memory": "./src/adapters/memory.ts",
-    "./adapters/postgres": "./src/adapters/postgres.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    },
+    "./adapters/memory": {
+      "types": "./dist/adapters/memory.d.ts",
+      "import": "./dist/adapters/memory.js",
+      "require": "./dist/adapters/memory.cjs"
+    },
+    "./adapters/postgres": {
+      "types": "./dist/adapters/postgres.d.ts",
+      "import": "./dist/adapters/postgres.js",
+      "require": "./dist/adapters/postgres.cjs"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./migration.sql": "./migrations/001_activity_schema.sql"
   },
   "scripts": {
-    "dev": "python3 -m http.server 5173 --bind 127.0.0.1 --directory dist",
-    "build": "tsc && node scripts/build.mjs",
-    "preview": "python3 -m http.server 4173 --bind 127.0.0.1 --directory dist",
-    "test": "node scripts/test.mjs"
+    "dev": "npm run build:demo && python3 -m http.server 5173 --bind 127.0.0.1 --directory demo-dist",
+    "build": "npm run clean && npm run typecheck && npm run build:sdk && npm run build:demo",
+    "build:sdk": "node scripts/build-package.mjs && tsc -p tsconfig.package.json",
+    "build:demo": "node scripts/build-demo.mjs",
+    "clean": "rm -rf dist demo-dist .tmp",
+    "typecheck": "tsc --noEmit",
+    "preview": "python3 -m http.server 4173 --bind 127.0.0.1 --directory demo-dist",
+    "test": "node scripts/test.mjs",
+    "prepack": "npm run clean && npm run typecheck && npm run build:sdk && npm test"
   },
-  "dependencies": {
+  "peerDependencies": {
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "css.gg": "2.1.4",
     "esbuild": "0.25.12",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "5.7.2"
   },
-  "devDependencies": {
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3"
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andreyshedko/activity.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andreyshedko/activity/issues"
+  },
+  "homepage": "https://github.com/andreyshedko/activity#readme",
+  "engines": {
+    "node": ">=20"
   }
 }

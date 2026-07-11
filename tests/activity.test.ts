@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   ActivityError,
   createActivity,
+  createMemoryStorageAdapter as createMemoryStorageAdapterFromRoot,
   type Actor,
   type Resource,
 } from "../src";
@@ -184,6 +185,7 @@ test("update events require at least one change", async () => {
 
 test("React entrypoint exposes ActivityPanel without requiring a Provider", () => {
   assert.equal(typeof ActivityPanel, "function");
+  assert.equal(typeof createMemoryStorageAdapterFromRoot, "function");
 });
 
 test("track rejects missing actor ids and invalid timestamps", async () => {

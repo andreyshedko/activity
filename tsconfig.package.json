@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "isolatedModules": false,
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": [
+    "src/activity.ts",
+    "src/ActivityPanel.tsx",
+    "src/index.ts",
+    "src/react.ts",
+    "src/adapters/**/*.ts"
+  ]
+}

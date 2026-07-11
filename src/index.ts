@@ -1,6 +1,7 @@
 export {
   ActivityError,
   createActivity,
+  createMemoryStorageAdapter,
   type Action,
   type Activity,
   type ActivityOptions,
