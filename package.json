@@ -1,5 +1,5 @@
 {
-  "name": "@andreyshedko/activity",
+  "name": "@feedclip/activity",
   "description": "Local-first activity history engine and React UI for business resources.",
   "license": "MIT",
   "version": "0.1.0",

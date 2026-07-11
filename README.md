@@ -9,7 +9,7 @@ architecture underneath it.
 ## Install
 
 ```bash
-npm install @andreyshedko/activity
+npm install @feedclip/activity
 ```
 
 React 18 or 19 is required only when using the React entrypoint.
@@ -20,7 +20,7 @@ React 18 or 19 is required only when using the React entrypoint.
 import {
   createActivity,
   createMemoryStorageAdapter,
-} from "@andreyshedko/activity";
+} from "@feedclip/activity";
 
 const activity = createActivity({
   adapter: createMemoryStorageAdapter(),
@@ -59,8 +59,8 @@ const entries = await activity.query({
 The Activity instance is passed explicitly. No provider is required.
 
 ```tsx
-import { ActivityPanel } from "@andreyshedko/activity/react";
-import "@andreyshedko/activity/styles.css";
+import { ActivityPanel } from "@feedclip/activity/react";
+import "@feedclip/activity/styles.css";
 
 export function InvoiceActivity() {
   return (
@@ -89,25 +89,25 @@ Apply the bundled migration, then create an adapter around any client exposing a
 Promise-based `query(sql, params)` method:
 
 ```ts
-import { createActivity } from "@andreyshedko/activity";
-import { postgresAdapter } from "@andreyshedko/activity/adapters/postgres";
+import { createActivity } from "@feedclip/activity";
+import { postgresAdapter } from "@feedclip/activity/adapters/postgres";
 
 const activity = createActivity({
   adapter: postgresAdapter(pool),
 });
 ```
 
-The migration is exported as `@andreyshedko/activity/migration.sql` and also lives
+The migration is exported as `@feedclip/activity/migration.sql` and also lives
 at [`migrations/001_activity_schema.sql`](./migrations/001_activity_schema.sql).
 
 ## Public entrypoints
 
-- `@andreyshedko/activity` — engine, types, and memory adapter
-- `@andreyshedko/activity/react` — `ActivityPanel`
-- `@andreyshedko/activity/adapters/memory`
-- `@andreyshedko/activity/adapters/postgres`
-- `@andreyshedko/activity/styles.css`
-- `@andreyshedko/activity/migration.sql`
+- `@feedclip/activity` — engine, types, and memory adapter
+- `@feedclip/activity/react` — `ActivityPanel`
+- `@feedclip/activity/adapters/memory`
+- `@feedclip/activity/adapters/postgres`
+- `@feedclip/activity/styles.css`
+- `@feedclip/activity/migration.sql`
 
 ## Development
 
