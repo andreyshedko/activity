@@ -3,3 +3,5 @@ dist/
 demo-dist/
 .tmp/
 .DS_Store
+examples/nextjs/.next/
+examples/nextjs/node_modules/

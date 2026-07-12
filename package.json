@@ -60,6 +60,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "axe-core": "^4.12.1",
     "css.gg": "2.1.4",
     "esbuild": "0.25.12",
     "jsdom": "^29.1.1",

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { JSDOM } from "jsdom";
+import axe from "axe-core";
 import { ActivityPanel } from "../src/react";
 import type { Activity, ActivityRecord } from "../src";
 
@@ -46,6 +47,14 @@ const entry: ActivityRecord = Object.freeze({
   ]),
 });
 
+const secondEntry: ActivityRecord = Object.freeze({
+  ...entry,
+  id: "evt_2",
+  action: "comment",
+  content: Object.freeze({ type: "comment", text: "Ready for payment" }),
+  changes: undefined,
+});
+
 test("controlled ActivityPanel renders localized empty state without querying", () => {
   render(
     <ActivityPanel
@@ -77,4 +86,46 @@ test("entry expands inline and Escape collapses it", () => {
 
   fireEvent.keyDown(toggle, { key: "Escape" });
   assert.equal(toggle.getAttribute("aria-expanded"), "false");
+});
+
+test("arrow, Home, and End keys move focus between entries", () => {
+  render(
+    <ActivityPanel
+      activity={activity}
+      entries={[entry, secondEntry]}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+
+  const toggles = screen.getAllByRole("button", { expanded: false });
+  toggles[0].focus();
+  fireEvent.keyDown(toggles[0], { key: "ArrowDown" });
+  assert.equal(document.activeElement, toggles[1]);
+  fireEvent.keyDown(toggles[1], { key: "Home" });
+  assert.equal(document.activeElement, toggles[0]);
+  fireEvent.keyDown(toggles[0], { key: "End" });
+  assert.equal(document.activeElement, toggles[1]);
+  fireEvent.keyDown(toggles[1], { key: "ArrowUp" });
+  assert.equal(document.activeElement, toggles[0]);
+});
+
+test("rendered panel has no automated axe violations", async () => {
+  const { container } = render(
+    <ActivityPanel
+      activity={activity}
+      entries={[entry, secondEntry]}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+
+  const result = await axe.run(container, {
+    rules: {
+      "color-contrast": { enabled: false },
+      region: { enabled: false },
+    },
+  });
+  assert.deepEqual(
+    result.violations.map(({ id }) => id),
+    [],
+  );
 });

@@ -36,5 +36,8 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - run: npm ci --prefix examples/nextjs
+      - run: npm run build --prefix examples/nextjs
+      - run: npm audit --prefix examples/nextjs --audit-level=moderate
       - run: npm audit --audit-level=moderate
       - run: npm pack --dry-run

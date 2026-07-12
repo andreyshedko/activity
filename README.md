@@ -123,6 +123,13 @@ GitHub Actions workflow provides PostgreSQL automatically; without a database th
 integration test is reported as skipped while unit and React tests still run.
 
 Architecture and product decisions are documented in [`spec/README.md`](./spec/README.md).
+The [`examples/nextjs`](./examples/nextjs) app verifies the package in a Next.js
+App Router production build.
+
+Release preparation and publishing requirements are tracked in
+[`RELEASE_CHECKLIST.md`](./RELEASE_CHECKLIST.md). Publishing is performed by the
+GitHub Release workflow with npm provenance after the `npm` environment and
+`NPM_TOKEN` secret are configured.
 
 ## Status
 

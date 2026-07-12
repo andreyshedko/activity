@@ -285,6 +285,28 @@ function ActivityEntryRow({
         onKeyDown={(event) => {
           if (event.key === "Escape") {
             setExpanded(false);
+            return;
+          }
+
+          if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+            const stream = event.currentTarget.closest(".activity-stream");
+            const toggles = Array.from(
+              stream?.querySelectorAll<HTMLButtonElement>("button.entry-main") ?? [],
+            );
+            const currentIndex = toggles.indexOf(event.currentTarget);
+            const nextIndex =
+              event.key === "Home"
+                ? 0
+                : event.key === "End"
+                  ? toggles.length - 1
+                  : event.key === "ArrowDown"
+                    ? Math.min(currentIndex + 1, toggles.length - 1)
+                    : Math.max(currentIndex - 1, 0);
+
+            if (toggles[nextIndex]) {
+              event.preventDefault();
+              toggles[nextIndex].focus();
+            }
           }
         }}
         type="button"
