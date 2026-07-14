@@ -7,6 +7,13 @@ the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-07-14
+
+### Fixed
+
+- Widened `ActivityPanelMessages` values from default string literals to `string`,
+  allowing consumers to provide localized and product-specific UI copy as intended.
+
 ## [0.1.0] - 2026-07-12
 
 ### Added
@@ -21,5 +28,6 @@ the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Unit, React accessibility, PostgreSQL integration, package-consumer, and CI checks.
 - Next.js App Router smoke example.
 
-[Unreleased]: https://github.com/andreyshedko/activity/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/andreyshedko/activity/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/andreyshedko/activity/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/andreyshedko/activity/releases/tag/v0.1.0

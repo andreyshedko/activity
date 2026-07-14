@@ -9,7 +9,9 @@ import {
   type ResourceReference,
 } from "./activity";
 
-export type ActivityPanelMessages = typeof defaultMessages;
+export type ActivityPanelMessages = {
+  [Key in keyof typeof defaultMessages]: string;
+};
 
 export type ActivityPanelProps = {
   activity: Activity;
