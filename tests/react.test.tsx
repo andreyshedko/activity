@@ -70,6 +70,30 @@ test("controlled ActivityPanel renders localized empty state without querying", 
   assert.ok(screen.getByText("Zatím žádná aktivita"));
 });
 
+test("ActivityPanel exposes light, dark, and system themes", () => {
+  const { rerender } = render(
+    <ActivityPanel
+      activity={activity}
+      entries={[]}
+      resource={{ type: "invoice", id: "inv_1" }}
+      theme="dark"
+    />,
+  );
+
+  const panel = screen.getByRole("region", { name: "Activity history" });
+  assert.equal(panel.getAttribute("data-activity-theme"), "dark");
+
+  rerender(
+    <ActivityPanel
+      activity={activity}
+      entries={[]}
+      resource={{ type: "invoice", id: "inv_1" }}
+      theme="system"
+    />,
+  );
+  assert.equal(panel.getAttribute("data-activity-theme"), "system");
+});
+
 test("entry expands inline and Escape collapses it", () => {
   render(
     <ActivityPanel

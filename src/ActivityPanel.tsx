@@ -13,6 +13,8 @@ export type ActivityPanelMessages = {
   [Key in keyof typeof defaultMessages]: string;
 };
 
+export type ActivityPanelTheme = "light" | "dark" | "system";
+
 export type ActivityPanelProps = {
   activity: Activity;
   resource: ResourceReference;
@@ -20,6 +22,7 @@ export type ActivityPanelProps = {
   search?: string;
   filters?: ActivityFilters;
   variant?: "default" | "compact" | "comfortable";
+  theme?: ActivityPanelTheme;
   onEntryClick?: (entry: ActivityRecord) => void;
   onError?: (error: Error) => void;
   onQueryChange?: (query: ActivityPanelQuery) => void;
@@ -103,6 +106,7 @@ export function ActivityPanel({
   onError,
   onQueryChange,
   search,
+  theme = "light",
   variant = "default",
   messages: messageOverrides,
   locale,
@@ -192,6 +196,7 @@ export function ActivityPanel({
   return (
     <section
       className={`activity-panel activity-panel--${variant}`}
+      data-activity-theme={theme}
       aria-label={messages.panelLabel}
     >
       <header className="activity-panel__header">

@@ -7,6 +7,11 @@ the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Added light, dark, and system themes to `ActivityPanel` through a typed `theme`
+  prop and customizable `--activity-*` CSS properties.
+
 ## [0.1.1] - 2026-07-14
 
 ### Fixed

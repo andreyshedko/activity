@@ -83,6 +83,32 @@ Use `messages` to replace UI copy and `locale` to format dates and time:
 />
 ```
 
+### Themes
+
+Use the `theme` prop to select the built-in light or dark theme, or follow the
+operating-system preference:
+
+```tsx
+<ActivityPanel
+  activity={activity}
+  resource={{ type: "invoice", id: "inv_123" }}
+  theme="system"
+/>
+```
+
+Accepted values are `"light"` (the default), `"dark"`, and `"system"`. Themes
+are implemented entirely with CSS custom properties. Override them after the
+package stylesheet to match your product:
+
+```css
+.activity-panel[data-activity-theme="dark"] {
+  --activity-color-surface: #09090b;
+  --activity-color-text: #e4e4e7;
+  --activity-color-accent: #34d399;
+  --activity-color-border: #3f3f46;
+}
+```
+
 ## PostgreSQL
 
 Apply the bundled migration, then create an adapter around any client exposing a
@@ -133,7 +159,7 @@ GitHub Release workflow with npm provenance after the `npm` environment and
 
 ## Status
 
-Version `0.1.0` is an MVP. The public contracts are usable, but the package has not
+Version `0.1.1` is an MVP. The public contracts are usable, but the package has not
 yet reached a stable `1.0` compatibility guarantee.
 
 ## License
