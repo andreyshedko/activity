@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
+import React from "react";
 import { JSDOM } from "jsdom";
 import axe from "axe-core";
 import { ActivityPanel } from "../src/react";
@@ -217,6 +218,215 @@ test("custom entry actions receive their record and support visibility and disab
   assert.equal(selectedId, entry.id);
   assert.equal(screen.getByRole("button", { name: "Approve invoice" }).hasAttribute("disabled"), true);
   assert.equal(screen.queryByRole("button", { name: "Hidden action" }), null);
+});
+
+test("renders every entry family, formatted value, metadata, and developer JSON", () => {
+  let clicked = "";
+  const richUpdate: ActivityRecord = Object.freeze({
+    ...entry,
+    metadata: Object.freeze({ source: "API", version: "2" }),
+    changes: Object.freeze([
+      Object.freeze({ field: "empty", label: "Empty", before: null, after: "Filled", valueType: "string" }),
+      Object.freeze({ field: "date", label: "Date", before: new Date("2026-01-01"), after: 42, valueType: "date" }),
+      Object.freeze({ field: "json", label: "JSON", before: { a: 1 }, after: true, valueType: "json" }),
+      Object.freeze({ field: "owner", label: "Owner", before: "Ada", after: "Grace", valueType: "user" }),
+    ]),
+  });
+  const records: ActivityRecord[] = [
+    richUpdate,
+    secondEntry,
+    Object.freeze({
+      ...entry,
+      id: "evt_attachment_small",
+      action: "attachment",
+      changes: undefined,
+      content: Object.freeze({ type: "attachment", fileName: "small.txt", mimeType: "text/plain", size: 512 }),
+    }),
+    Object.freeze({
+      ...entry,
+      id: "evt_attachment_large",
+      action: "attachment",
+      changes: undefined,
+      content: Object.freeze({ type: "attachment", fileName: "large.pdf", mimeType: "application/pdf", size: 2048 }),
+    }),
+    Object.freeze({ ...entry, id: "evt_create", action: "create", changes: undefined }),
+    Object.freeze({
+      ...entry,
+      id: "evt_create_fallback",
+      action: "create",
+      changes: undefined,
+      resource: Object.freeze({ type: "invoice", id: "inv_1" }),
+    }),
+    Object.freeze({
+      ...entry,
+      id: "evt_archive",
+      action: "archive",
+      changes: undefined,
+      metadata: Object.freeze({ reason: "Duplicate" }),
+    }),
+    Object.freeze({
+      ...entry,
+      id: "evt_delete",
+      action: "delete",
+      changes: undefined,
+      resource: Object.freeze({ type: "invoice", id: "inv_1" }),
+    }),
+  ];
+  render(
+    <ActivityPanel
+      activity={activity}
+      entries={records}
+      locale="en-US"
+      onEntryClick={(selected) => { clicked = selected.id; }}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+
+  assert.ok(screen.getByText("+1 more changes"));
+  assert.ok(screen.getByText("512 B - text/plain"));
+  assert.ok(screen.getByText("2 KB - application/pdf"));
+  assert.ok(screen.getByText("Reason: Duplicate"));
+  const toggles = screen.getAllByRole("button", { expanded: false });
+  fireEvent.click(toggles[0]);
+  assert.equal(clicked, richUpdate.id);
+  assert.ok(screen.getByText("Grace"));
+  assert.ok(screen.getByText("API"));
+  assert.ok(screen.getByText("2"));
+
+  fireEvent.click(screen.getByRole("checkbox", { name: "Developer" }));
+  assert.ok(document.querySelector(".developer-json"));
+});
+
+test("defensively renders update entries without changes", () => {
+  render(
+    <ActivityPanel
+      activity={activity}
+      entries={[
+        Object.freeze({ ...entry, id: "evt_no_changes", changes: undefined }),
+        Object.freeze({ ...entry, id: "evt_empty_changes", changes: Object.freeze([]) }),
+      ]}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  assert.equal(screen.getAllByText("Updated").length, 2);
+});
+
+test("local search and action-family controls emit normalized panel queries", async () => {
+  const queries: Array<{ search?: string; actions?: readonly string[] }> = [];
+  const queryActivity: Activity = {
+    async track() { throw new Error("not used"); },
+    async query() { return []; },
+  };
+  render(
+    <ActivityPanel
+      activity={queryActivity}
+      onQueryChange={(query) => queries.push(query)}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  await screen.findByText("No activity yet");
+  fireEvent.change(screen.getByRole("textbox", { name: "Search activity" }), { target: { value: "paid" } });
+  await screen.findByText("No matching activity");
+
+  for (const name of ["Updates", "Content", "Lifecycle", "All"]) {
+    fireEvent.click(screen.getByRole("button", { name }));
+  }
+  assert.ok(queries.some((query) => query.search === "paid"));
+  assert.ok(queries.some((query) => query.actions?.includes("comment")));
+  assert.ok(queries.some((query) => query.actions?.includes("archive")));
+});
+
+test("controlled filters disable family controls and reach the activity query", async () => {
+  let received: unknown;
+  const filteredActivity: Activity = {
+    async track() { throw new Error("not used"); },
+    async query(options) {
+      received = options;
+      return [];
+    },
+  };
+  render(
+    <ActivityPanel
+      activity={filteredActivity}
+      filters={{
+        actions: ["update"],
+        actor: "usr_1",
+        from: new Date("2026-01-01"),
+        to: new Date("2026-12-31"),
+      }}
+      resource={{ type: "invoice", id: "inv_1" }}
+      search="fixed"
+      variant="compact"
+    />,
+  );
+  await screen.findByText("No matching activity");
+  assert.equal(screen.getByRole("textbox", { name: "Search activity" }).hasAttribute("disabled"), true);
+  assert.equal(screen.getByRole("button", { name: "Updates" }).hasAttribute("disabled"), true);
+  assert.equal((received as { actor: string }).actor, "usr_1");
+});
+
+test("loading skeletons honor every variant", () => {
+  const pendingActivity: Activity = {
+    async track() { throw new Error("not used"); },
+    async query() { return new Promise<ActivityRecord[]>(() => undefined); },
+  };
+  for (const [variant, rows] of [["compact", 3], ["default", 4], ["comfortable", 5]] as const) {
+    const { unmount } = render(
+      <ActivityPanel
+        activity={pendingActivity}
+        resource={{ type: "invoice", id: variant }}
+        variant={variant}
+      />,
+    );
+    assert.equal(document.querySelectorAll(".skeleton-row").length, rows);
+    unmount();
+  }
+});
+
+test("non-Error query failures are normalized and reported", async () => {
+  let reported: Error | undefined;
+  const failingActivity: Activity = {
+    async track() { throw new Error("not used"); },
+    async query() { throw "failure"; },
+  };
+  render(
+    <ActivityPanel
+      activity={failingActivity}
+      onError={(error) => { reported = error; }}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  assert.ok(await screen.findByRole("heading", { name: "Activity could not load" }));
+  assert.equal(reported?.message, "Activity could not load");
+});
+
+test("custom icons, copy, and fallback metadata remain accessible", () => {
+  let copied = "";
+  Object.defineProperty(dom.window.navigator, "clipboard", {
+    configurable: true,
+    value: { async writeText(value: string) { copied = value; } },
+  });
+  render(
+    <ActivityPanel
+      activity={activity}
+      entries={[entry]}
+      entryActions={[{
+        id: "icon",
+        label: "Icon action",
+        icon: <span data-testid="custom-icon">*</span>,
+        onSelect: () => undefined,
+      }]}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  assert.ok(screen.getByTestId("custom-icon"));
+  fireEvent.click(screen.getByRole("button", { name: "Copy activity id" }));
+  assert.equal(copied, entry.id);
+  fireEvent.click(screen.getByRole("button", { expanded: false }));
+  assert.ok(screen.getByText("Application"));
+  assert.ok(screen.getByText("Unversioned"));
+  Object.defineProperty(dom.window.navigator, "clipboard", { configurable: true, value: undefined });
+  fireEvent.click(screen.getByRole("button", { name: "Copy activity id" }));
 });
 
 test("entry expands inline and Escape collapses it", () => {

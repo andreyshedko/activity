@@ -184,8 +184,8 @@ export function createMemoryStorageAdapter(
         .filter((entry) => matchesDates(entry, normalized.from, normalized.to))
         .filter((entry) => matchesSearch(entry, normalized.search))
         .sort(compareRecords);
-      const offset = normalized.offset ?? 0;
-      const limit = normalized.limit ?? 50;
+      const offset = normalized.offset as number;
+      const limit = normalized.limit as number;
       const page = filtered.slice(offset, offset + limit);
 
       return {
@@ -263,8 +263,8 @@ export function postgresAdapter(client: Queryable | Connectable): StorageAdapter
     },
     async query(options) {
       const normalized = normalizeQuery(options);
-      const limit = normalized.limit ?? 50;
-      const offset = normalized.offset ?? 0;
+      const limit = normalized.limit as number;
+      const offset = normalized.offset as number;
       const params: unknown[] = [normalized.resource.type, normalized.resource.id];
       const where = ["e.resource_type = $1", "e.resource_id = $2"];
 

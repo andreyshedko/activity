@@ -2,6 +2,10 @@ node_modules/
 dist/
 demo-dist/
 .tmp/
+.coverage/
+coverage/
+playwright-report/
+test-results/
 .DS_Store
 examples/nextjs/.next/
 examples/nextjs/node_modules/

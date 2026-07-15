@@ -191,11 +191,16 @@ at [`migrations/001_activity_schema.sql`](./migrations/001_activity_schema.sql).
 ```bash
 npm install
 npm test
+npm run test:e2e
 npm run build
 npm run dev
 ```
 
-`npm test` runs the PostgreSQL integration suite when `DATABASE_URL` is set. The
+`npm test` enforces 100% line, branch, and function coverage for the published
+engine, adapters, entrypoints, and React component. `npm run test:e2e` builds the
+production demo and runs the Chromium user-journey suite with Playwright.
+
+The PostgreSQL integration suite runs when `DATABASE_URL` is set. The
 GitHub Actions workflow provides PostgreSQL automatically; without a database the
 integration test is reported as skipped while unit and React tests still run.
 

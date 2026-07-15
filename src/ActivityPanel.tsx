@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   type Action,
   type Activity,
@@ -109,7 +109,6 @@ const defaultMessages = {
   noActivityHelp: "Tracked entries for this resource will appear here.",
   noMatchesHelp: "Try a broader search or a different action family.",
   loadError: "Activity could not load",
-  loadErrorFallback: "The activity query returned an error.",
   retryLabel: "Try again",
   none: "None",
   moreChanges: "more changes",
@@ -288,7 +287,7 @@ export function ActivityPanel({
         renderError && error ? (
           renderError({ error, retry })
         ) : (
-          <ActivityErrorState error={error} messages={messages} retry={retry} />
+          <ActivityErrorState error={error!} messages={messages} retry={retry} />
         )
       ) : null}
       {status === "ready" && entries.length === 0 ? (
@@ -350,9 +349,9 @@ function ActivityEntryRow({
           }
 
           if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
-            const stream = event.currentTarget.closest(".activity-stream");
+            const stream = event.currentTarget.closest(".activity-stream")!;
             const toggles = Array.from(
-              stream?.querySelectorAll<HTMLButtonElement>("button.entry-main") ?? [],
+              stream.querySelectorAll<HTMLButtonElement>("button.entry-main"),
             );
             const currentIndex = toggles.indexOf(event.currentTarget);
             const nextIndex =
@@ -561,14 +560,14 @@ function ActivityErrorState({
   messages,
   retry,
 }: {
-  error: Error | null;
+  error: Error;
   messages: ActivityPanelMessages;
   retry: () => void;
 }) {
   return (
     <div className="empty-state">
       <h2>{messages.loadError}</h2>
-      <p>{error?.message ?? messages.loadErrorFallback}</p>
+      <p>{error.message}</p>
       <button className="activity-retry" onClick={retry} type="button">
         {messages.retryLabel}
       </button>

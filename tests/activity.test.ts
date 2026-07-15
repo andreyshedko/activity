@@ -243,6 +243,146 @@ test("query sends immutable normalized options to storage", async () => {
   assert.equal(options.offset, 0);
 });
 
+test("track validates every required field and content contract", async () => {
+  const activity = createActivity({ adapter: createMemoryStorageAdapter() });
+  const invalidInputs = [
+    { resource: { ...invoice, type: " " }, actor, action: "create", field: "resource.type" },
+    { resource: { ...invoice, id: " " }, actor, action: "create", field: "resource.id" },
+    { resource: invoice, actor: { ...actor, type: "invalid" }, action: "create", field: "actor.type" },
+    { resource: invoice, actor: { ...actor, name: " " }, action: "create", field: "actor.name" },
+    { resource: invoice, actor, action: " ", field: "action" },
+    { resource: invoice, actor, action: "comment", field: "content" },
+    { resource: invoice, actor, action: "attachment", field: "content" },
+  ];
+
+  for (const { field, ...input } of invalidInputs) {
+    await assert.rejects(
+      activity.track(input as Parameters<typeof activity.track>[0]),
+      (error) => error instanceof ActivityError && error.field === field,
+    );
+  }
+
+  for (const change of [
+    { field: " ", label: "Status" },
+    { field: "status", label: " " },
+  ]) {
+    await assert.rejects(
+      activity.track({
+        resource: invoice,
+        actor,
+        action: "update",
+        changes: [{ ...change, valueType: "string" }],
+      }),
+      (error) => error instanceof ActivityError && error.code === "INVALID_CHANGE",
+    );
+  }
+});
+
+test("query validates resource, pagination, and date ranges", async () => {
+  const activity = createActivity({ adapter: createMemoryStorageAdapter() });
+  const invalidQueries = [
+    { resource: { type: "", id: "inv_1" }, field: "resource" },
+    { resource: invoice, limit: 0, field: "limit" },
+    { resource: invoice, limit: 501, field: "limit" },
+    { resource: invoice, offset: -1, field: "offset" },
+    {
+      resource: invoice,
+      from: new Date("2026-07-12T00:00:00Z"),
+      to: new Date("2026-07-11T00:00:00Z"),
+      field: "from",
+    },
+  ];
+
+  for (const { field, ...options } of invalidQueries) {
+    await assert.rejects(
+      activity.query(options),
+      (error) => error instanceof ActivityError && error.field === field,
+    );
+  }
+});
+
+test("memory adapter covers actor, date, pagination, ordering, and value inference", async () => {
+  const adapter = createMemoryStorageAdapter([], 1);
+  const activity = createActivity({
+    adapter,
+    idGenerator: createSequentialIds("evt_full"),
+  });
+  const timestamps = [
+    new Date("2026-07-11T10:00:00Z"),
+    new Date("2026-07-11T10:00:00Z"),
+    new Date("2026-07-12T10:00:00Z"),
+  ];
+  const values = [
+    new Date("2026-07-10T00:00:00Z"),
+    true,
+    { nested: "value" },
+    "text",
+    42,
+  ];
+
+  for (let index = 0; index < values.length; index += 1) {
+    await activity.track({
+      resource: invoice,
+      actor: index === 2 ? { ...actor, id: "usr_other", name: "Other User" } : actor,
+      action: "update",
+      timestamp: timestamps[index] ?? new Date(`2026-07-${13 + index}T10:00:00Z`),
+      changes: [{
+        field: `field_${index}`,
+        label: `Field ${index}`,
+        before: index === 0 ? null : undefined,
+        after: values[index],
+      } as Parameters<typeof activity.track>[0]["changes"] extends (infer Item)[] | undefined ? Item : never],
+    });
+  }
+
+  const page = await adapter.query({
+    resource: invoice,
+    actorId: actor.id,
+    from: new Date("2026-07-11T00:00:00Z"),
+    to: new Date("2026-07-11T23:59:59Z"),
+    limit: 1,
+    offset: 0,
+  });
+  assert.equal(page.total, 2);
+  assert.equal(page.entries.length, 1);
+  assert.equal(page.hasMore, true);
+  assert.equal(page.entries[0].id, "evt_full_2");
+
+  const byActorAlias = await adapter.query({ resource: invoice, actor: "usr_other" });
+  assert.equal(byActorAlias.entries.length, 1);
+  const noMatches = await adapter.query({ resource: invoice, search: "missing" });
+  assert.equal(noMatches.entries.length, 0);
+  const dateSearch = await adapter.query({ resource: invoice, search: "2026-07-10" });
+  assert.equal(dateSearch.entries.length, 1);
+  assert.deepEqual(
+    (await adapter.query({ resource: invoice })).entries.map((record) => record.changes?.[0].valueType),
+    ["number", "string", "json", "boolean", "date"],
+  );
+
+  const inferredFromBefore = await activity.track({
+    resource: invoice,
+    actor,
+    action: "update",
+    changes: [{ field: "fallback", label: "Fallback", before: "before" } as never],
+  });
+  assert.equal(inferredFromBefore.changes?.[0].valueType, "string");
+});
+
+test("default id generation supports crypto UUID and fallback ids", async () => {
+  const activity = createActivity({ adapter: createMemoryStorageAdapter() });
+  const uuidRecord = await activity.track({ resource: invoice, actor, action: "create" });
+  assert.ok(uuidRecord.id.length > 0);
+
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "crypto");
+  Object.defineProperty(globalThis, "crypto", { configurable: true, value: undefined });
+  try {
+    const fallback = await activity.track({ resource: invoice, actor, action: "create" });
+    assert.match(fallback.id, /^act_/);
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, "crypto", descriptor);
+  }
+});
+
 function createSequentialIds(prefix: string) {
   let count = 0;
   return () => `${prefix}_${++count}`;
