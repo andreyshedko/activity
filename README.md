@@ -19,6 +19,12 @@ Try the package in a clean browser environment with the
 The example installs the public npm release rather than importing SDK source
 files from this repository.
 
+To test the current release candidate directly, install the `next` tag:
+
+```bash
+npm install @feedclip/activity@next
+```
+
 ## Quick start
 
 ```ts
