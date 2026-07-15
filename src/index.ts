@@ -9,6 +9,7 @@ export {
   type Actor,
   type ActorType,
   type AttachmentContent,
+  type AttachmentPolicy,
   type BuiltInAction,
   type Change,
   type CommentContent,

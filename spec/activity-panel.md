@@ -203,6 +203,10 @@ Comments отображают: content, actor, timestamp.
 
 Attachments отображают: filename, size, mime type, actor, timestamp.
 
+Панель НЕ ДОЛЖНА автоматически переходить по сохранённому attachment URL.
+`onAttachmentOpen(attachment, entry)` делегирует авторизацию и выдачу download URL
+host-приложению.
+
 ## 15. Рендеринг Lifecycle-записи
 
 Примеры: Created, Archived, Deleted, Restored (соответствуют встроенным Actions, см. [`data-model.md`](./data-model.md) §10 «Правила по Action»).

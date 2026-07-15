@@ -23,6 +23,7 @@ export function App() {
     resource: demoResources[0].resource,
   });
   const [adapterMode, setAdapterMode] = useState<AdapterMode>("memory");
+  const [openedAttachment, setOpenedAttachment] = useState<string | null>(null);
   const selectedResource =
     demoResources.find((item) => item.resource.id === selectedResourceId) ??
     demoResources[0];
@@ -244,9 +245,15 @@ await activity.track({
           <ActivityPanel
             activity={activity}
             key={`${selectedResource.resource.type}:${selectedResource.resource.id}:${refreshToken}`}
+            onAttachmentOpen={(attachment) => setOpenedAttachment(attachment.fileName)}
             onQueryChange={setLastQuery}
             resource={selectedResource.resource}
           />
+          {openedAttachment ? (
+            <p className="attachment-demo-status" role="status">
+              Application received attachment: {openedAttachment}
+            </p>
+          ) : null}
           <QueryInspector query={lastQuery} />
         </div>
       </section>

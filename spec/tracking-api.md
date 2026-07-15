@@ -255,6 +255,11 @@ activity.track({
 })
 ```
 
+Attachment tracking ОБЯЗАНО валидировать соответствие `action` и `content.type`,
+неотрицательный конечный `size`, непустые `fileName`/`mimeType`, настроенную MIME
+policy и URL protocol policy. По умолчанию absolute URL разрешает только HTTPS;
+root-relative URL разрешён для application-owned download endpoints.
+
 ## 15. Ошибки
 
 Ошибки валидации ОБЯЗАНЫ содержать: `code`, `message`, `field`.

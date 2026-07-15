@@ -493,6 +493,16 @@ button {
   min-width: 0;
 }
 
+.attachment-demo-status {
+  margin: 0;
+  border: 1px solid #d8dee4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 0.82rem;
+  padding: 10px 12px;
+}
+
 .query-inspector {
   display: grid;
   gap: 12px;

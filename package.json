@@ -10,7 +10,9 @@
   "files": [
     "dist",
     "migrations",
-    "README.md"
+    "README.md",
+    "SECURITY.md",
+    "COMPATIBILITY.md"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

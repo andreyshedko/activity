@@ -383,6 +383,68 @@ test("default id generation supports crypto UUID and fallback ids", async () => 
   }
 });
 
+test("attachments enforce content shape and safe URL defaults", async () => {
+  const activity = createActivity({ adapter: createMemoryStorageAdapter() });
+  for (const input of [
+    { action: "comment", content: { type: "custom", value: 1 } },
+    { action: "attachment", content: { type: "comment", text: "wrong" } },
+    { action: "attachment", content: { type: "attachment", fileName: " ", mimeType: "text/plain", size: 1 } },
+    { action: "attachment", content: { type: "attachment", fileName: "a.txt", mimeType: " ", size: 1 } },
+    { action: "attachment", content: { type: "attachment", fileName: "a.txt", mimeType: "text/plain", size: -1 } },
+    { action: "attachment", content: { type: "attachment", fileName: "a.txt", mimeType: "text/plain", size: Number.NaN } },
+    { action: "attachment", content: { type: "attachment", fileName: "a.txt", mimeType: "text/plain", size: 1, url: "javascript:alert(1)" } },
+    { action: "attachment", content: { type: "attachment", fileName: "a.txt", mimeType: "text/plain", size: 1, url: "//evil.example/a" } },
+    { action: "attachment", content: { type: "attachment", fileName: "a.txt", mimeType: "text/plain", size: 1, url: "not a url" } },
+  ]) {
+    await assert.rejects(
+      activity.track({ resource: invoice, actor, ...input } as Parameters<typeof activity.track>[0]),
+      ActivityError,
+    );
+  }
+
+  for (const url of [undefined, "/downloads/a.txt", "https://cdn.example.com/a.txt"]) {
+    const record = await activity.track({
+      resource: invoice,
+      actor,
+      action: "attachment",
+      content: { type: "attachment", fileName: "a.txt", mimeType: "text/plain", size: 1, url },
+    });
+    assert.equal(record.content?.type, "attachment");
+  }
+});
+
+test("attachment policy supports size, MIME wildcards, and explicit protocols", async () => {
+  const policyActivity = createActivity({
+    adapter: createMemoryStorageAdapter(),
+    attachmentPolicy: {
+      maxSizeBytes: 10,
+      allowedMimeTypes: ["image/*", "application/pdf"],
+      allowedUrlProtocols: ["https:", "http:"],
+    },
+  });
+  await policyActivity.track({
+    resource: invoice,
+    actor,
+    action: "attachment",
+    content: { type: "attachment", fileName: "a.png", mimeType: "image/png", size: 10, url: "http://localhost/a.png" },
+  });
+  await policyActivity.track({
+    resource: invoice,
+    actor,
+    action: "attachment",
+    content: { type: "attachment", fileName: "a.pdf", mimeType: "application/pdf", size: 5 },
+  });
+  for (const content of [
+    { type: "attachment" as const, fileName: "large.png", mimeType: "image/png", size: 11 },
+    { type: "attachment" as const, fileName: "code.js", mimeType: "text/javascript", size: 1 },
+  ]) {
+    await assert.rejects(
+      policyActivity.track({ resource: invoice, actor, action: "attachment", content }),
+      ActivityError,
+    );
+  }
+});
+
 function createSequentialIds(prefix: string) {
   let count = 0;
   return () => `${prefix}_${++count}`;

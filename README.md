@@ -112,6 +112,39 @@ callback receives the immutable `ActivityRecord` for that row:
 Actions are keyboard-accessible. Supply `icon` with any React node when an icon
 is preferred; `label` remains the accessible name and tooltip.
 
+### Attachments
+
+Activity records attachment metadata; file upload, malware scanning, access
+control, and download delivery stay in the host application. Configure validation
+when creating the engine:
+
+```ts
+const activity = createActivity({
+  adapter,
+  attachmentPolicy: {
+    maxSizeBytes: 25 * 1024 * 1024,
+    allowedMimeTypes: ["image/*", "application/pdf"],
+    allowedUrlProtocols: ["https:"],
+  },
+});
+```
+
+`ActivityPanel` does not navigate to stored URLs. Handle attachment access in the
+application, reauthorize the user, and generate a fresh short-lived URL:
+
+```tsx
+<ActivityPanel
+  activity={activity}
+  onAttachmentOpen={(attachment, entry) => {
+    openAuthorizedDownload(entry.resource, attachment);
+  }}
+  resource={{ type: "invoice", id: "inv_123" }}
+/>
+```
+
+See [`SECURITY.md`](./SECURITY.md) for data and attachment security guidance and
+[`COMPATIBILITY.md`](./COMPATIBILITY.md) for the supported runtime matrix.
+
 ### Themes
 
 Use the `theme` prop to select the built-in light or dark theme, or follow the

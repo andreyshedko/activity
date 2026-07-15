@@ -4,6 +4,7 @@ import {
   type Activity,
   type ActivityRecord,
   ActivityError,
+  type AttachmentContent,
   type BuiltInAction,
   type Change,
   type ResourceReference,
@@ -50,6 +51,7 @@ export type ActivityPanelProps = {
   renderEmpty?: (state: ActivityPanelEmptyState) => ReactNode;
   renderError?: (state: ActivityPanelErrorState) => ReactNode;
   entryActions?: readonly ActivityEntryAction[];
+  onAttachmentOpen?: (attachment: Readonly<AttachmentContent>, entry: ActivityRecord) => void;
 };
 
 type ActivityFilters = {
@@ -98,6 +100,7 @@ const defaultMessages = {
   entryActionsLabel: "Entry actions",
   copyIdLabel: "Copy activity id",
   copyIdTitle: "Copy ID",
+  openAttachmentLabel: "Open attachment",
   changedBy: "Changed by",
   at: "At",
   source: "Source",
@@ -136,6 +139,7 @@ export function ActivityPanel({
   renderEmpty,
   renderError,
   entryActions = [],
+  onAttachmentOpen,
 }: ActivityPanelProps) {
   const messages = { ...defaultMessages, ...messageOverrides };
   const actionLabels: Record<Filter, string> = {
@@ -303,6 +307,7 @@ export function ActivityPanel({
               developerMode={developerMode}
               entry={entry}
               entryActions={entryActions}
+              onAttachmentOpen={onAttachmentOpen}
               key={entry.id}
               onEntryClick={onEntryClick}
               messages={messages}
@@ -319,6 +324,7 @@ function ActivityEntryRow({
   developerMode,
   entry,
   entryActions,
+  onAttachmentOpen,
   onEntryClick,
   messages,
   locale,
@@ -326,6 +332,7 @@ function ActivityEntryRow({
   developerMode: boolean;
   entry: ActivityRecord;
   entryActions: readonly ActivityEntryAction[];
+  onAttachmentOpen?: (attachment: Readonly<AttachmentContent>, entry: ActivityRecord) => void;
   onEntryClick?: (entry: ActivityRecord) => void;
   messages: ActivityPanelMessages;
   locale?: string;
@@ -389,6 +396,16 @@ function ActivityEntryRow({
         </span>
       </button>
       <div className="entry-actions" aria-label={messages.entryActionsLabel}>
+        {onAttachmentOpen && entry.content?.type === "attachment" ? (
+          <button
+            aria-label={`${messages.openAttachmentLabel}: ${entry.content.fileName}`}
+            onClick={() => onAttachmentOpen(entry.content as Readonly<AttachmentContent>, entry)}
+            title={messages.openAttachmentLabel}
+            type="button"
+          >
+            <span className="gg-icon gg-icon--attachment" aria-hidden="true" />
+          </button>
+        ) : null}
         {visibleActions.map((action) => (
           <button
             aria-label={action.label}

@@ -60,6 +60,12 @@ export type AttachmentContent = {
   url?: string;
 };
 
+export type AttachmentPolicy = {
+  maxSizeBytes?: number;
+  allowedMimeTypes?: readonly string[];
+  allowedUrlProtocols?: readonly string[];
+};
+
 export type CustomContent = {
   type: "custom";
   [key: string]: unknown;
@@ -129,6 +135,7 @@ export type ActivityOptions = {
   adapter: StorageAdapter;
   clock?: () => Date;
   idGenerator?: () => string;
+  attachmentPolicy?: AttachmentPolicy;
 };
 
 export class ActivityError extends Error {
@@ -147,10 +154,11 @@ export function createActivity({
   adapter,
   clock = () => new Date(),
   idGenerator = createId,
+  attachmentPolicy,
 }: ActivityOptions): Activity {
   return {
     async track(input) {
-      const record = createRecord(input, clock, idGenerator);
+      const record = createRecord(input, clock, idGenerator, attachmentPolicy);
       await adapter.insert(record);
       return record;
     },
@@ -355,8 +363,9 @@ function createRecord(
   input: TrackInput,
   clock: () => Date,
   idGenerator: () => string,
+  attachmentPolicy?: AttachmentPolicy,
 ): ActivityRecord {
-  validateTrackInput(input);
+  validateTrackInput(input, attachmentPolicy);
 
   const record: ActivityRecord = {
     id: idGenerator(),
@@ -376,7 +385,7 @@ function createRecord(
   return freezeRecord(record);
 }
 
-function validateTrackInput(input: TrackInput) {
+function validateTrackInput(input: TrackInput, attachmentPolicy?: AttachmentPolicy) {
   if (!input.resource?.type?.trim()) {
     throw new ActivityError("INVALID_RESOURCE", "resource.type is required", "resource.type");
   }
@@ -411,6 +420,59 @@ function validateTrackInput(input: TrackInput) {
 
   if ((input.action === "comment" || input.action === "attachment") && !input.content) {
     throw new ActivityError("INVALID_ACTION", `${input.action} requires content`, "content");
+  }
+
+  if (input.action === "comment" && input.content?.type !== "comment") {
+    throw new ActivityError("INVALID_CONTENT", "comment requires comment content", "content.type");
+  }
+
+  if (input.action === "attachment") {
+    if (input.content?.type !== "attachment") {
+      throw new ActivityError("INVALID_CONTENT", "attachment requires attachment content", "content.type");
+    }
+    validateAttachment(input.content, attachmentPolicy);
+  }
+}
+
+function validateAttachment(content: AttachmentContent, policy: AttachmentPolicy = {}) {
+  if (!content.fileName.trim()) {
+    throw new ActivityError("INVALID_ATTACHMENT", "attachment.fileName is required", "content.fileName");
+  }
+  if (!content.mimeType.trim()) {
+    throw new ActivityError("INVALID_ATTACHMENT", "attachment.mimeType is required", "content.mimeType");
+  }
+  if (!Number.isFinite(content.size) || content.size < 0) {
+    throw new ActivityError("INVALID_ATTACHMENT", "attachment.size must be a non-negative finite number", "content.size");
+  }
+  if (policy.maxSizeBytes !== undefined && content.size > policy.maxSizeBytes) {
+    throw new ActivityError("INVALID_ATTACHMENT", "attachment exceeds the configured size limit", "content.size");
+  }
+  if (policy.allowedMimeTypes?.length && !matchesMimeType(content.mimeType, policy.allowedMimeTypes)) {
+    throw new ActivityError("INVALID_ATTACHMENT", "attachment MIME type is not allowed", "content.mimeType");
+  }
+  if (content.url) {
+    validateAttachmentUrl(content.url, policy.allowedUrlProtocols ?? ["https:"]);
+  }
+}
+
+function matchesMimeType(mimeType: string, allowed: readonly string[]) {
+  return allowed.some((candidate) =>
+    candidate.endsWith("/*")
+      ? mimeType.startsWith(candidate.slice(0, -1))
+      : mimeType === candidate,
+  );
+}
+
+function validateAttachmentUrl(url: string, allowedProtocols: readonly string[]) {
+  if (url.startsWith("/") && !url.startsWith("//")) return;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new ActivityError("INVALID_ATTACHMENT", "attachment.url must be an absolute or root-relative URL", "content.url");
+  }
+  if (!allowedProtocols.includes(parsed.protocol)) {
+    throw new ActivityError("INVALID_ATTACHMENT", "attachment URL protocol is not allowed", "content.url");
   }
 }
 

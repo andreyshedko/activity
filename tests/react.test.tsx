@@ -429,6 +429,37 @@ test("custom icons, copy, and fallback metadata remain accessible", () => {
   fireEvent.click(screen.getByRole("button", { name: "Copy activity id" }));
 });
 
+test("attachment open handler receives the immutable attachment and entry", () => {
+  const attachment = Object.freeze({
+    type: "attachment" as const,
+    fileName: "invoice.pdf",
+    mimeType: "application/pdf",
+    size: 2048,
+    url: "https://cdn.example.com/invoice.pdf",
+  });
+  const attachmentEntry: ActivityRecord = Object.freeze({
+    ...entry,
+    id: "evt_attachment_open",
+    action: "attachment",
+    changes: undefined,
+    content: attachment,
+  });
+  let opened: { fileName: string; entryId: string } | undefined;
+  render(
+    <ActivityPanel
+      activity={activity}
+      entries={[attachmentEntry, entry]}
+      onAttachmentOpen={(selectedAttachment, selectedEntry) => {
+        opened = { fileName: selectedAttachment.fileName, entryId: selectedEntry.id };
+      }}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Open attachment: invoice.pdf" }));
+  assert.deepEqual(opened, { fileName: "invoice.pdf", entryId: attachmentEntry.id });
+  assert.equal(screen.getAllByRole("button", { name: /Open attachment/ }).length, 1);
+});
+
 test("entry expands inline and Escape collapses it", () => {
   render(
     <ActivityPanel

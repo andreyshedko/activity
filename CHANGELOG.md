@@ -17,6 +17,8 @@ the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   disabled states, optional icons, and keyboard-accessible controls.
 - Added an enforced 100% unit/component coverage gate and Playwright browser E2E
   coverage for search, filters, resources, expansion, tracking, and async states.
+- Added attachment validation policies, safe URL defaults, host-controlled opening,
+  browser coverage, and production security/compatibility documentation.
 
 ## [0.1.1] - 2026-07-14
 

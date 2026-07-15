@@ -41,6 +41,13 @@ test("expands an entry and exposes developer details", async ({ page }) => {
   await expect(firstEntry).toHaveAttribute("aria-expanded", "false");
 });
 
+test("delegates attachment opening to the host application", async ({ page }) => {
+  const attachmentEntry = page.locator(".activity-entry").filter({ hasText: "contract-v3.pdf" });
+  await attachmentEntry.hover();
+  await attachmentEntry.getByRole("button", { name: "Open attachment: contract-v3.pdf" }).click();
+  await expect(page.getByRole("status")).toHaveText("Application received attachment: contract-v3.pdf");
+});
+
 test("tracks a new update through the demo composer", async ({ page }) => {
   await page.getByLabel("Change label").fill("Review state");
   await page.getByLabel("Before").fill("Queued");
