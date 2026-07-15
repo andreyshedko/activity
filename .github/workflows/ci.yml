@@ -62,7 +62,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm install --no-save react@${{ matrix.react }} react-dom@${{ matrix.react }}
-      - run: npm test
+      - run: npm run test:unit
       - run: npm run build
 
   postgres-compatibility:
