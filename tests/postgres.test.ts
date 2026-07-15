@@ -15,6 +15,18 @@ test(
       const migration = await readFile("migrations/001_activity_schema.sql", "utf8");
       await pool.query(migration);
       await pool.query("truncate activity_changes, activity_entries cascade");
+      await pool.query(`insert into activity_entries (
+        id, resource_type, resource_id, action, actor_type, actor_id, actor_name, created_at
+      ) values (
+        'ffffffff-ffff-4fff-8fff-ffffffffffff', 'migration', 'existing', 'create',
+        'system', 'migration-test', 'Migration test', '2026-01-01T00:00:00Z'
+      )`);
+      await pool.query(migration);
+      const preserved = await pool.query(
+        "select count(*)::int as count from activity_entries where resource_id = 'existing'",
+      );
+      assert.equal(preserved.rows[0].count, 1);
+      await pool.query("truncate activity_changes, activity_entries cascade");
 
       let id = 0;
       const adapter = postgresAdapter(pool);

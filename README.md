@@ -209,6 +209,7 @@ const activity = createActivity({
 
 The migration is exported as `@feedclip/activity/migration.sql` and also lives
 at [`migrations/001_activity_schema.sql`](./migrations/001_activity_schema.sql).
+Deployment and upgrade rules are documented in [`MIGRATIONS.md`](./MIGRATIONS.md).
 
 ## Public entrypoints
 
@@ -225,6 +226,7 @@ at [`migrations/001_activity_schema.sql`](./migrations/001_activity_schema.sql).
 npm install
 npm test
 npm run test:e2e
+npm run benchmark:postgres
 npm run build
 npm run dev
 ```

@@ -19,6 +19,8 @@ the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   coverage for search, filters, resources, expansion, tracking, and async states.
 - Added attachment validation policies, safe URL defaults, host-controlled opening,
   browser coverage, and production security/compatibility documentation.
+- Added existing-data migration verification, a forward-only migration guide, and
+  a PostgreSQL 100,000-row p95 performance gate.
 
 ## [0.1.1] - 2026-07-14
 
