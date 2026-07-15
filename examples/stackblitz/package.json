@@ -1,0 +1,22 @@
+{
+  "name": "activity-stackblitz-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build"
+  },
+  "dependencies": {
+    "@feedclip/activity": "^0.1.1",
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest"
+  }
+}

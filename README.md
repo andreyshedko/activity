@@ -14,6 +14,11 @@ npm install @feedclip/activity
 
 React 18 or 19 is required only when using the React entrypoint.
 
+Try the package in a clean browser environment with the
+[StackBlitz installation example](https://stackblitz.com/github/andreyshedko/activity?file=examples%2Fstackblitz%2Fsrc%2FApp.tsx&startScript=stackblitz).
+The example installs the public npm release rather than importing SDK source
+files from this repository.
+
 ## Quick start
 
 ```ts

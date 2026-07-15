@@ -60,7 +60,8 @@
     "api:check": "npm run build:sdk && node scripts/check-public-api.mjs",
     "api:update": "npm run build:sdk && node scripts/check-public-api.mjs --update",
     "verify": "npm test && npm run test:e2e && npm run build && npm run api:check && npm run test:package",
-    "prepack": "npm run clean && npm run typecheck && npm run build:sdk && npm test"
+    "prepack": "npm run clean && npm run typecheck && npm run build:sdk && npm test",
+    "stackblitz": "npm install --prefix examples/stackblitz && npm run dev --prefix examples/stackblitz -- --host 0.0.0.0"
   },
   "peerDependencies": {
     "react": ">=18 <20",
