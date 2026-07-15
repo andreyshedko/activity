@@ -182,6 +182,43 @@ test("refreshing keeps existing entries visible", async () => {
   assert.ok(await screen.findByText("Ready for payment"));
 });
 
+test("custom entry actions receive their record and support visibility and disabled state", () => {
+  let selectedId = "";
+  render(
+    <ActivityPanel
+      activity={activity}
+      entries={[entry]}
+      entryActions={[
+        {
+          id: "open",
+          label: "Open invoice",
+          onSelect: (selectedEntry) => {
+            selectedId = selectedEntry.id;
+          },
+        },
+        {
+          id: "approve",
+          label: "Approve invoice",
+          isDisabled: () => true,
+          onSelect: () => undefined,
+        },
+        {
+          id: "hidden",
+          label: "Hidden action",
+          isVisible: () => false,
+          onSelect: () => undefined,
+        },
+      ]}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: "Open invoice" }));
+  assert.equal(selectedId, entry.id);
+  assert.equal(screen.getByRole("button", { name: "Approve invoice" }).hasAttribute("disabled"), true);
+  assert.equal(screen.queryByRole("button", { name: "Hidden action" }), null);
+});
+
 test("entry expands inline and Escape collapses it", () => {
   render(
     <ActivityPanel

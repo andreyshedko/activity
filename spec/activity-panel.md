@@ -81,6 +81,7 @@
 | `locale` | BCP 47 locale для форматирования дат и времени через `Intl.DateTimeFormat` |
 | `renderEmpty` | Пользовательский renderer empty state; получает `{ hasQuery }` |
 | `renderError` | Пользовательский renderer error state; получает `{ error, retry }` |
+| `entryActions` | Пользовательские действия над записью с visibility и disabled predicates |
 
 > **Связь с OPEN-002 ✅ Решено** ([`public-api.md`](./public-api.md) §11, [`rfc/RFC-002-query-execution-model.md`](./rfc/RFC-002-query-execution-model.md)): наличие `entries` как controlled-режима было верным сигналом — формально закреплено, что в uncontrolled-режиме `ActivityPanel` по умолчанию выполняет запрос самостоятельно (**PUBAPI-052**).
 
@@ -164,6 +165,16 @@ Query → Error State
 ## 12. Модель разворачивания
 
 Каждая запись имеет одно из двух состояний: **Collapsed** или **Expanded**. Промежуточных состояний не существует.
+
+### Действия записи
+
+`entryActions` добавляет прикладные действия рядом со встроенным Copy ID. Каждое
+действие имеет стабильный `id`, доступный `label`, обработчик `onSelect(entry)` и
+опциональные `icon`, `isVisible(entry)`, `isDisabled(entry)`.
+
+- **PANEL-043** — Действия ОБЯЗАНЫ быть доступны с клавиатуры и иметь accessible name.
+- **PANEL-044** — Скрытое действие НЕ ДОЛЖНО присутствовать в DOM.
+- **PANEL-045** — Disabled-действие НЕ ДОЛЖНО вызывать `onSelect`.
 
 ## 13. Рендеринг Update-записи
 

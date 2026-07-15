@@ -83,6 +83,35 @@ Use `messages` to replace UI copy and `locale` to format dates and time:
 />
 ```
 
+### Custom entry actions
+
+Add product-specific actions without teaching Activity about your domain. Each
+callback receives the immutable `ActivityRecord` for that row:
+
+```tsx
+<ActivityPanel
+  activity={activity}
+  entryActions={[
+    {
+      id: "open-invoice",
+      label: "Open invoice",
+      onSelect: (entry) => openInvoice(entry.resource.id),
+    },
+    {
+      id: "restore",
+      label: "Restore",
+      isVisible: (entry) => entry.action === "archive",
+      isDisabled: (entry) => entry.actor.type === "system",
+      onSelect: restoreFromEntry,
+    },
+  ]}
+  resource={{ type: "invoice", id: "inv_123" }}
+/>
+```
+
+Actions are keyboard-accessible. Supply `icon` with any React node when an icon
+is preferred; `label` remains the accessible name and tooltip.
+
 ### Themes
 
 Use the `theme` prop to select the built-in light or dark theme, or follow the

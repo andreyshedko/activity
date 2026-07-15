@@ -1,5 +1,6 @@
 export {
   ActivityPanel,
+  type ActivityEntryAction,
   type ActivityPanelMessages,
   type ActivityPanelEmptyState,
   type ActivityPanelErrorState,

@@ -25,6 +25,15 @@ export type ActivityPanelErrorState = {
   retry: () => void;
 };
 
+export type ActivityEntryAction = {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+  onSelect: (entry: ActivityRecord) => void;
+  isVisible?: (entry: ActivityRecord) => boolean;
+  isDisabled?: (entry: ActivityRecord) => boolean;
+};
+
 export type ActivityPanelProps = {
   activity: Activity;
   resource: ResourceReference;
@@ -40,6 +49,7 @@ export type ActivityPanelProps = {
   locale?: string;
   renderEmpty?: (state: ActivityPanelEmptyState) => ReactNode;
   renderError?: (state: ActivityPanelErrorState) => ReactNode;
+  entryActions?: readonly ActivityEntryAction[];
 };
 
 type ActivityFilters = {
@@ -126,6 +136,7 @@ export function ActivityPanel({
   locale,
   renderEmpty,
   renderError,
+  entryActions = [],
 }: ActivityPanelProps) {
   const messages = { ...defaultMessages, ...messageOverrides };
   const actionLabels: Record<Filter, string> = {
@@ -292,6 +303,7 @@ export function ActivityPanel({
             <ActivityEntryRow
               developerMode={developerMode}
               entry={entry}
+              entryActions={entryActions}
               key={entry.id}
               onEntryClick={onEntryClick}
               messages={messages}
@@ -307,18 +319,21 @@ export function ActivityPanel({
 function ActivityEntryRow({
   developerMode,
   entry,
+  entryActions,
   onEntryClick,
   messages,
   locale,
 }: {
   developerMode: boolean;
   entry: ActivityRecord;
+  entryActions: readonly ActivityEntryAction[];
   onEntryClick?: (entry: ActivityRecord) => void;
   messages: ActivityPanelMessages;
   locale?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const summary = getEntrySummary(entry, messages);
+  const visibleActions = entryActions.filter((action) => action.isVisible?.(entry) ?? true);
   return (
     <article className="activity-entry">
       <button
@@ -375,6 +390,18 @@ function ActivityEntryRow({
         </span>
       </button>
       <div className="entry-actions" aria-label={messages.entryActionsLabel}>
+        {visibleActions.map((action) => (
+          <button
+            aria-label={action.label}
+            disabled={action.isDisabled?.(entry) ?? false}
+            key={action.id}
+            onClick={() => action.onSelect(entry)}
+            title={action.label}
+            type="button"
+          >
+            {action.icon ?? <span className="entry-action-label">{action.label}</span>}
+          </button>
+        ))}
         <button
           aria-label={messages.copyIdLabel}
           onClick={() => void copyText(entry.id)}

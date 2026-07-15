@@ -269,6 +269,7 @@
   color: var(--activity-color-control-text);
   font-size: 0.72rem;
   font-weight: 750;
+  padding: 0 7px;
 }
 
 .entry-actions button:hover,
@@ -276,6 +277,15 @@
   border-color: var(--activity-color-border-strong);
   background: var(--activity-color-code-background);
   outline: none;
+}
+
+.entry-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.entry-action-label {
+  white-space: nowrap;
 }
 
 .gg-icon {
