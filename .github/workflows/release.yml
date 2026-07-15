@@ -32,6 +32,13 @@ jobs:
       - run: npm run api:check
       - run: npm run test:package
       - run: npm audit --audit-level=moderate
-      - run: npm publish --provenance --access public
+      - name: Publish package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            npm publish --provenance --access public --tag next
+          else
+            npm publish --provenance --access public
+          fi
