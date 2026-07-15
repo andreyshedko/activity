@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   type Action,
   type Activity,
@@ -14,6 +14,16 @@ export type ActivityPanelMessages = {
 };
 
 export type ActivityPanelTheme = "light" | "dark" | "system";
+export type ActivityPanelVariant = "default" | "compact" | "comfortable";
+
+export type ActivityPanelEmptyState = {
+  hasQuery: boolean;
+};
+
+export type ActivityPanelErrorState = {
+  error: Error;
+  retry: () => void;
+};
 
 export type ActivityPanelProps = {
   activity: Activity;
@@ -21,13 +31,15 @@ export type ActivityPanelProps = {
   entries?: ActivityRecord[];
   search?: string;
   filters?: ActivityFilters;
-  variant?: "default" | "compact" | "comfortable";
+  variant?: ActivityPanelVariant;
   theme?: ActivityPanelTheme;
   onEntryClick?: (entry: ActivityRecord) => void;
   onError?: (error: Error) => void;
   onQueryChange?: (query: ActivityPanelQuery) => void;
   messages?: Partial<ActivityPanelMessages>;
   locale?: string;
+  renderEmpty?: (state: ActivityPanelEmptyState) => ReactNode;
+  renderError?: (state: ActivityPanelErrorState) => ReactNode;
 };
 
 type ActivityFilters = {
@@ -72,6 +84,7 @@ const defaultMessages = {
   filterContent: "Content",
   filterLifecycle: "Lifecycle",
   loadingLabel: "Loading activity",
+  refreshingLabel: "Refreshing activity",
   entryActionsLabel: "Entry actions",
   copyIdLabel: "Copy activity id",
   copyIdTitle: "Copy ID",
@@ -87,6 +100,7 @@ const defaultMessages = {
   noMatchesHelp: "Try a broader search or a different action family.",
   loadError: "Activity could not load",
   loadErrorFallback: "The activity query returned an error.",
+  retryLabel: "Try again",
   none: "None",
   moreChanges: "more changes",
   updated: "Updated",
@@ -110,6 +124,8 @@ export function ActivityPanel({
   variant = "default",
   messages: messageOverrides,
   locale,
+  renderEmpty,
+  renderError,
 }: ActivityPanelProps) {
   const messages = { ...defaultMessages, ...messageOverrides };
   const actionLabels: Record<Filter, string> = {
@@ -119,13 +135,15 @@ export function ActivityPanel({
     lifecycle: messages.filterLifecycle,
   };
   const [entries, setEntries] = useState<ActivityRecord[]>(controlledEntries ?? []);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+  const [status, setStatus] = useState<"loading" | "refreshing" | "ready" | "error">(
     controlledEntries ? "ready" : "loading",
   );
   const [error, setError] = useState<Error | null>(null);
   const [localSearch, setLocalSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [developerMode, setDeveloperMode] = useState(false);
+  const [retryToken, setRetryToken] = useState(0);
+  const hasLoaded = useRef(controlledEntries !== undefined);
 
   const query = search ?? localSearch;
   const activeActions = useMemo(() => {
@@ -139,12 +157,13 @@ export function ActivityPanel({
   useEffect(() => {
     if (controlledEntries) {
       setEntries(controlledEntries);
+      hasLoaded.current = true;
       setStatus("ready");
       return;
     }
 
     let cancelled = false;
-    setStatus("loading");
+    setStatus(hasLoaded.current ? "refreshing" : "loading");
     setError(null);
     const queryOptions: ActivityPanelQuery = {
       resource,
@@ -161,6 +180,7 @@ export function ActivityPanel({
       .then((nextEntries) => {
         if (!cancelled) {
           setEntries(nextEntries);
+          hasLoaded.current = true;
           setStatus("ready");
         }
       })
@@ -191,7 +211,11 @@ export function ActivityPanel({
     onQueryChange,
     query,
     resource,
+    retryToken,
   ]);
+
+  const retry = () => setRetryToken((value) => value + 1);
+  const hasQuery = query.trim().length > 0 || filter !== "all";
 
   return (
     <section
@@ -241,13 +265,28 @@ export function ActivityPanel({
         </div>
       </div>
 
-      {status === "loading" ? <ActivityLoading messages={messages} /> : null}
-      {status === "error" ? <ActivityErrorState error={error} messages={messages} /> : null}
+      {status === "loading" ? (
+        <ActivityLoading messages={messages} variant={variant} />
+      ) : null}
+      {status === "refreshing" ? (
+        <div className="activity-refreshing" role="status">
+          {messages.refreshingLabel}
+        </div>
+      ) : null}
+      {status === "error" ? (
+        renderError && error ? (
+          renderError({ error, retry })
+        ) : (
+          <ActivityErrorState error={error} messages={messages} retry={retry} />
+        )
+      ) : null}
       {status === "ready" && entries.length === 0 ? (
-        <ActivityEmpty hasQuery={query.trim().length > 0 || filter !== "all"} messages={messages} />
+        renderEmpty ? renderEmpty({ hasQuery }) : (
+          <ActivityEmpty hasQuery={hasQuery} messages={messages} />
+        )
       ) : null}
 
-      {status === "ready" && entries.length > 0 ? (
+      {(status === "ready" || status === "refreshing") && entries.length > 0 ? (
         <div className="activity-stream">
           {entries.map((entry) => (
             <ActivityEntryRow
@@ -449,10 +488,21 @@ function UpdateChanges({
   );
 }
 
-function ActivityLoading({ messages }: { messages: ActivityPanelMessages }) {
+function ActivityLoading({
+  messages,
+  variant,
+}: {
+  messages: ActivityPanelMessages;
+  variant: ActivityPanelVariant;
+}) {
+  const rowCount = variant === "compact" ? 3 : variant === "comfortable" ? 5 : 4;
   return (
-    <div className="activity-skeleton" aria-label={messages.loadingLabel}>
-      {Array.from({ length: 4 }, (_, index) => (
+    <div
+      className={`activity-skeleton activity-skeleton--${variant}`}
+      aria-label={messages.loadingLabel}
+      role="status"
+    >
+      {Array.from({ length: rowCount }, (_, index) => (
         <div className="skeleton-row" key={index}>
           <span />
           <div>
@@ -479,11 +529,22 @@ function ActivityEmpty({ hasQuery, messages }: { hasQuery: boolean; messages: Ac
   );
 }
 
-function ActivityErrorState({ error, messages }: { error: Error | null; messages: ActivityPanelMessages }) {
+function ActivityErrorState({
+  error,
+  messages,
+  retry,
+}: {
+  error: Error | null;
+  messages: ActivityPanelMessages;
+  retry: () => void;
+}) {
   return (
     <div className="empty-state">
       <h2>{messages.loadError}</h2>
       <p>{error?.message ?? messages.loadErrorFallback}</p>
+      <button className="activity-retry" onClick={retry} type="button">
+        {messages.retryLabel}
+      </button>
     </div>
   );
 }

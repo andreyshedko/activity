@@ -109,6 +109,28 @@ package stylesheet to match your product:
 }
 ```
 
+### Loading, empty, and error states
+
+The panel keeps existing entries visible while a changed search or filter is
+refreshing. Initial loading uses a skeleton sized for the selected `variant`.
+The default error state includes a retry button.
+
+Applications can replace empty and error content while retaining the panel's
+query lifecycle:
+
+```tsx
+<ActivityPanel
+  activity={activity}
+  renderEmpty={({ hasQuery }) => (
+    <MyEmptyState filtered={hasQuery} />
+  )}
+  renderError={({ error, retry }) => (
+    <MyErrorState error={error} onRetry={retry} />
+  )}
+  resource={{ type: "invoice", id: "inv_123" }}
+/>
+```
+
 ## PostgreSQL
 
 Apply the bundled migration, then create an adapter around any client exposing a

@@ -516,6 +516,34 @@ ins {
   line-height: 1.45;
 }
 
+.activity-retry {
+  min-height: 34px;
+  margin-top: 6px;
+  border: 1px solid var(--activity-color-border);
+  border-radius: 7px;
+  background: var(--activity-color-surface);
+  color: var(--activity-color-text);
+  font-weight: 650;
+  padding: 0 14px;
+}
+
+.activity-retry:hover {
+  border-color: var(--activity-color-border-strong);
+  background: var(--activity-color-hover);
+}
+
+.activity-retry:focus-visible {
+  outline: 2px solid var(--activity-color-accent);
+  outline-offset: 2px;
+}
+
+.activity-refreshing {
+  border-bottom: 1px solid var(--activity-color-divider-subtle);
+  color: var(--activity-color-text-secondary-muted);
+  font-size: 0.75rem;
+  padding: 7px 18px;
+}
+
 .activity-skeleton {
   display: grid;
   gap: 0;
@@ -538,6 +566,14 @@ ins {
   background: linear-gradient(90deg, var(--activity-color-skeleton), var(--activity-color-hover), var(--activity-color-skeleton));
   background-size: 200% 100%;
   animation: shimmer 1.2s infinite linear;
+}
+
+.activity-skeleton--compact .skeleton-row {
+  padding-block: 10px;
+}
+
+.activity-skeleton--comfortable .skeleton-row {
+  padding-block: 20px;
 }
 
 .skeleton-row span {

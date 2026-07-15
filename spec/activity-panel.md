@@ -71,6 +71,7 @@
 | Prop | Описание |
 |---|---|
 | `variant` | `"default" \| "compact" \| "comfortable"`, по умолчанию `"default"` |
+| `theme` | `"light" \| "dark" \| "system"`, по умолчанию `"light"` |
 | `search` | Контролируемое значение поиска |
 | `filters` | Контролируемые фильтры |
 | `entries` | Controlled mode. Если передан, `ActivityPanel` НЕ ДОЛЖЕН выполнять запросы самостоятельно |
@@ -78,6 +79,8 @@
 | `onError` | Вызывается при ошибке загрузки |
 | `messages` | Частичное переопределение всех системных UI-сообщений |
 | `locale` | BCP 47 locale для форматирования дат и времени через `Intl.DateTimeFormat` |
+| `renderEmpty` | Пользовательский renderer empty state; получает `{ hasQuery }` |
+| `renderError` | Пользовательский renderer error state; получает `{ error, retry }` |
 
 > **Связь с OPEN-002 ✅ Решено** ([`public-api.md`](./public-api.md) §11, [`rfc/RFC-002-query-execution-model.md`](./rfc/RFC-002-query-execution-model.md)): наличие `entries` как controlled-режима было верным сигналом — формально закреплено, что в uncontrolled-режиме `ActivityPanel` по умолчанию выполняет запрос самостоятельно (**PUBAPI-052**).
 
@@ -98,6 +101,12 @@
 Initial mount → Loading → Query → Render
 ```
 
+Повторный запрос после успешной загрузки сохраняет текущие записи:
+
+```text
+Rendered entries → Refreshing → Query → Render
+```
+
 Если запрос завершается ошибкой:
 
 ```text
@@ -108,6 +117,8 @@ Query → Error State
 
 - **PANEL-001** — Loading state ОБЯЗАН появляться до завершения первого запроса.
 - **PANEL-002** — Loading state ОБЯЗАН исчезать немедленно после успеха или ошибки.
+- **PANEL-003** — Refreshing state ОБЯЗАН сохранять уже загруженные записи видимыми.
+- **PANEL-004** — Error state ОБЯЗАН предоставлять действие повторного запроса.
 
 ## 8. Empty State
 

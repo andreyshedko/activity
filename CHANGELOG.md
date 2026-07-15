@@ -11,6 +11,8 @@ the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added light, dark, and system themes to `ActivityPanel` through a typed `theme`
   prop and customizable `--activity-*` CSS properties.
+- Added retryable error states, non-blocking refresh feedback, variant-aware
+  loading skeletons, and custom empty/error renderers to `ActivityPanel`.
 
 ## [0.1.1] - 2026-07-14
 

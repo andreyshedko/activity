@@ -94,6 +94,94 @@ test("ActivityPanel exposes light, dark, and system themes", () => {
   assert.equal(panel.getAttribute("data-activity-theme"), "system");
 });
 
+test("error state retries the failed query", async () => {
+  let attempts = 0;
+  const retryingActivity: Activity = {
+    async track() {
+      throw new Error("not used");
+    },
+    async query() {
+      attempts += 1;
+      if (attempts === 1) throw new Error("Database unavailable");
+      return [];
+    },
+  };
+
+  render(
+    <ActivityPanel
+      activity={retryingActivity}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+
+  assert.ok(await screen.findByText("Database unavailable"));
+  fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+  assert.ok(await screen.findByText("No activity yet"));
+  assert.equal(attempts, 2);
+});
+
+test("custom empty and error renderers receive state actions", async () => {
+  const failingActivity: Activity = {
+    async track() {
+      throw new Error("not used");
+    },
+    async query() {
+      throw new Error("Custom failure");
+    },
+  };
+  const { rerender } = render(
+    <ActivityPanel
+      activity={activity}
+      entries={[]}
+      renderEmpty={({ hasQuery }) => <p>{hasQuery ? "Filtered empty" : "Custom empty"}</p>}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  assert.ok(screen.getByText("Custom empty"));
+
+  rerender(
+    <ActivityPanel
+      activity={failingActivity}
+      renderError={({ error, retry }) => (
+        <button onClick={retry} type="button">Custom: {error.message}</button>
+      )}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  assert.ok(await screen.findByRole("button", { name: "Custom: Custom failure" }));
+});
+
+test("refreshing keeps existing entries visible", async () => {
+  let queryCount = 0;
+  let resolveRefresh!: (entries: ActivityRecord[]) => void;
+  const refreshingActivity: Activity = {
+    async track() {
+      throw new Error("not used");
+    },
+    async query() {
+      queryCount += 1;
+      if (queryCount === 1) return [entry];
+      return new Promise<ActivityRecord[]>((resolve) => {
+        resolveRefresh = resolve;
+      });
+    },
+  };
+  const resource = { type: "invoice", id: "inv_1" };
+  const { rerender } = render(
+    <ActivityPanel activity={refreshingActivity} resource={resource} />,
+  );
+  assert.ok(await screen.findByText("Approved"));
+
+  rerender(
+    <ActivityPanel activity={refreshingActivity} resource={resource} search="payment" />,
+  );
+  assert.ok(await screen.findByText("Refreshing activity"));
+  assert.ok(screen.getByText("Approved"));
+
+  resolveRefresh([secondEntry]);
+  assert.ok(await screen.findByText("Ready for payment"));
+});
+
 test("entry expands inline and Escape collapses it", () => {
   render(
     <ActivityPanel
