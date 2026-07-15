@@ -13,7 +13,8 @@
     "README.md",
     "SECURITY.md",
     "COMPATIBILITY.md",
-    "MIGRATIONS.md"
+    "MIGRATIONS.md",
+    "API_STABILITY.md"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -55,6 +56,8 @@
     "test:coverage": "node --import tsx --experimental-test-coverage --test-coverage-include=src/activity.ts --test-coverage-include=src/ActivityPanel.tsx --test-coverage-include=src/index.ts --test-coverage-include=src/react.ts --test-coverage-include=src/adapters/*.ts --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 --test tests/*.test.ts tests/*.test.tsx",
     "test:e2e": "npm run build:demo && playwright test",
     "benchmark:postgres": "npm run build:sdk && node scripts/benchmark-postgres.mjs",
+    "api:check": "npm run build:sdk && node scripts/check-public-api.mjs",
+    "api:update": "npm run build:sdk && node scripts/check-public-api.mjs --update",
     "verify": "npm test && npm run test:e2e && npm run build",
     "prepack": "npm run clean && npm run typecheck && npm run build:sdk && npm test"
   },

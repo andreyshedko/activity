@@ -21,6 +21,8 @@ the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   browser coverage, and production security/compatibility documentation.
 - Added existing-data migration verification, a forward-only migration guide, and
   a PostgreSQL 100,000-row p95 performance gate.
+- Added Node 20/22, React 18/19, and PostgreSQL 14–17 CI matrices plus a reviewed
+  public TypeScript API snapshot gate and deprecation policy.
 
 ## [0.1.1] - 2026-07-14
 

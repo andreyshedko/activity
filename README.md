@@ -144,6 +144,8 @@ application, reauthorize the user, and generate a fresh short-lived URL:
 
 See [`SECURITY.md`](./SECURITY.md) for data and attachment security guidance and
 [`COMPATIBILITY.md`](./COMPATIBILITY.md) for the supported runtime matrix.
+Public API compatibility and deprecation rules are documented in
+[`API_STABILITY.md`](./API_STABILITY.md).
 
 ### Themes
 
@@ -227,6 +229,7 @@ npm install
 npm test
 npm run test:e2e
 npm run benchmark:postgres
+npm run api:check
 npm run build
 npm run dev
 ```
