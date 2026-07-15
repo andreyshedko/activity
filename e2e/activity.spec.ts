@@ -52,6 +52,35 @@ test("delegates attachment opening to the host application", async ({ page }) =>
   await expect(page.getByRole("status")).toHaveText("Application received attachment: contract-v3.pdf");
 });
 
+test("supports keyboard navigation across activity entries", async ({ page }) => {
+  const entries = page.locator("button.entry-main");
+  await entries.first().focus();
+  await entries.first().press("ArrowDown");
+  await expect(entries.nth(1)).toBeFocused();
+  await entries.nth(1).press("End");
+  await expect(entries.last()).toBeFocused();
+  await entries.last().press("Home");
+  await expect(entries.first()).toBeFocused();
+});
+
+test("switches light, dark, and system themes", async ({ page }) => {
+  const panel = page.getByRole("region", { name: "Activity history" });
+  await expect(panel).toHaveAttribute("data-activity-theme", "light");
+  await page.getByRole("button", { name: "dark", exact: true }).click();
+  await expect(panel).toHaveAttribute("data-activity-theme", "dark");
+  await expect(panel).toHaveCSS("color-scheme", "dark");
+  await page.getByRole("button", { name: "system", exact: true }).click();
+  await expect(panel).toHaveAttribute("data-activity-theme", "system");
+});
+
+test("recovers from a query error through retry", async ({ page }) => {
+  await page.getByRole("button", { name: "error", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Activity could not load" })).toBeVisible();
+  await expect(page.getByText("Demo query failed")).toBeVisible();
+  await page.getByRole("button", { name: "Try again" }).click();
+  await expect(page.getByText("Status", { exact: true }).first()).toBeVisible();
+});
+
 test("tracks a new update through the demo composer", async ({ page }) => {
   await page.getByLabel("Change label").fill("Review state");
   await page.getByLabel("Before").fill("Queued");

@@ -1,14 +1,19 @@
 import { useMemo, useState } from "react";
-import { ActivityPanel, type ActivityPanelQuery } from "./ActivityPanel";
+import {
+  ActivityPanel,
+  type ActivityPanelQuery,
+  type ActivityPanelTheme,
+} from "./ActivityPanel";
 import { createActivity, createMemoryStorageAdapter, type Action } from "./activity";
 import { activityEntries, demoResources } from "./mockData";
 
-type DemoState = "default" | "loading" | "empty";
+type DemoState = "default" | "loading" | "empty" | "error";
 type ComposerMode = "update" | "comment";
 type AdapterMode = "memory" | "postgres";
 
 export function App() {
   const [state, setState] = useState<DemoState>("default");
+  const [theme, setTheme] = useState<ActivityPanelTheme>("light");
   const [selectedResourceId, setSelectedResourceId] = useState(
     demoResources[0].resource.id,
   );
@@ -31,9 +36,24 @@ export function App() {
     const entries = state === "empty" ? [] : activityEntries;
     const latency = state === "loading" ? 1200 : 260;
 
-    return createActivity({
-      adapter: createMemoryStorageAdapter(entries, latency),
-    });
+    const adapter = createMemoryStorageAdapter(entries, latency);
+    if (state === "error") {
+      let failNextQuery = true;
+      return createActivity({
+        adapter: {
+          ...adapter,
+          async query(options) {
+            if (failNextQuery) {
+              failNextQuery = false;
+              throw new Error("Demo query failed");
+            }
+            return adapter.query(options);
+          },
+        },
+      });
+    }
+
+    return createActivity({ adapter });
   }, [state]);
   const trackExample = async () => {
     setIsTracking(true);
@@ -85,12 +105,25 @@ export function App() {
           <span>Resource history infrastructure</span>
         </div>
         <div className="demo-controls" aria-label="Demo state">
-          {(["default", "loading", "empty"] as DemoState[]).map((item) => (
+          {(["default", "loading", "empty", "error"] as DemoState[]).map((item) => (
             <button
               aria-pressed={state === item}
               className={state === item ? "is-active" : ""}
               key={item}
               onClick={() => setState(item)}
+              type="button"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+        <div className="demo-controls" aria-label="Activity theme">
+          {(["light", "dark", "system"] as ActivityPanelTheme[]).map((item) => (
+            <button
+              aria-pressed={theme === item}
+              className={theme === item ? "is-active" : ""}
+              key={item}
+              onClick={() => setTheme(item)}
               type="button"
             >
               {item}
@@ -248,6 +281,7 @@ await activity.track({
             onAttachmentOpen={(attachment) => setOpenedAttachment(attachment.fileName)}
             onQueryChange={setLastQuery}
             resource={selectedResource.resource}
+            theme={theme}
           />
           {openedAttachment ? (
             <p className="attachment-demo-status" role="status">
