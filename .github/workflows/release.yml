@@ -26,9 +26,11 @@ jobs:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: node -e "const version=require('./package.json').version; if (process.env.RELEASE_TAG !== 'v' + version) { throw new Error('Release tag must equal v' + version); }"
       - run: npm test
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
       - run: npm run build
+      - run: npm run api:check
+      - run: npm run test:package
       - run: npm audit --audit-level=moderate
       - run: npm publish --provenance --access public
         env:

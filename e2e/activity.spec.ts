@@ -1,4 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const axePath = require.resolve("axe-core/axe.min.js");
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
@@ -67,3 +71,25 @@ test("shows refreshing and empty demo states", async ({ page }) => {
   await page.getByRole("button", { name: "empty", exact: true }).click();
   await expect(page.getByText("No activity yet")).toBeVisible();
 });
+
+test("has no automatically detectable accessibility violations", async ({ page }) => {
+  await page.addScriptTag({ path: axePath });
+  const violations = await page.evaluate(async () => {
+    const result = await window.axe.run(document, {
+      runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] },
+    });
+    return result.violations.map(({ id, impact, nodes }) => ({
+      id,
+      impact,
+      targets: nodes.map((node) => node.target),
+    }));
+  });
+
+  expect(violations).toEqual([]);
+});
+
+declare global {
+  interface Window {
+    axe: typeof import("axe-core");
+  }
+}
