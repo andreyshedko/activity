@@ -29,6 +29,7 @@ try {
     "dist/styles.css",
     "migrations/001_activity_schema.sql",
     "README.md",
+    "CHANGELOG.md",
     "SECURITY.md",
     "COMPATIBILITY.md",
     "MIGRATIONS.md",

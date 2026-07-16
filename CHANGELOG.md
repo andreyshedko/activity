@@ -1,50 +1,52 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to `@feedclip/activity` are documented here. The project
+follows [Semantic Versioning](https://semver.org/).
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
-the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
+## [0.2.1] - 2026-07-16
 
 ### Added
 
-- Added light, dark, and system themes to `ActivityPanel` through a typed `theme`
-  prop and customizable `--activity-*` CSS properties.
-- Added retryable error states, non-blocking refresh feedback, variant-aware
-  loading skeletons, and custom empty/error renderers to `ActivityPanel`.
-- Added typed, record-aware custom entry actions with conditional visibility,
-  disabled states, optional icons, and keyboard-accessible controls.
-- Added an enforced 100% unit/component coverage gate and Playwright browser E2E
-  coverage for search, filters, resources, expansion, tracking, and async states.
-- Added attachment validation policies, safe URL defaults, host-controlled opening,
-  browser coverage, and production security/compatibility documentation.
-- Added existing-data migration verification, a forward-only migration guide, and
-  a PostgreSQL 100,000-row p95 performance gate.
-- Added Node 20/22, React 18/19, and PostgreSQL 14–17 CI matrices plus a reviewed
-  public TypeScript API snapshot gate and deprecation policy.
+- Added this changelog to the npm package and linked it from the README.
+
+## [0.2.0] - 2026-07-16
+
+### Added
+
+- Added light, dark, and system themes with CSS custom-property overrides.
+- Added explicit loading, refreshing, empty, error, retry, and custom-renderer states.
+- Added product-specific entry actions and host-controlled attachment opening.
+- Added configurable attachment size, MIME type, and URL protocol policies.
+- Added PostgreSQL migration verification and a 100,000-row performance gate.
+- Added public API declaration snapshots and compatibility documentation.
+- Added clean-package consumer tests for ESM, CommonJS, React 18, and React 19.
+- Added StackBlitz and Next.js installation examples.
+
+### Changed
+
+- Expanded CI to Node.js 20/22, React 18/19, and PostgreSQL 14–17.
+- Expanded Playwright coverage to Chromium, Firefox, and WebKit.
+- Enforced 100% unit-test coverage and automated WCAG accessibility checks.
+- Hardened release verification, package-content limits, and secret scanning.
+
+### Security
+
+- Attachment URLs default to HTTPS and are delegated to the host application
+  for authorization and short-lived download delivery.
 
 ## [0.1.1] - 2026-07-14
 
-### Fixed
+### Changed
 
-- Widened `ActivityPanelMessages` values from default string literals to `string`,
-  allowing consumers to provide localized and product-specific UI copy as intended.
+- Prepared the package for independent publishing under `@feedclip/activity`.
 
-## [0.1.0] - 2026-07-12
+## [0.1.0] - 2026-07-14
 
 ### Added
 
-- Framework-independent Activity engine with immutable records.
-- Memory and PostgreSQL storage adapters.
-- Resource-scoped search, filters, deterministic ordering, and offset pagination.
-- React ActivityPanel with controlled and uncontrolled modes.
-- Localizable UI messages and locale-aware date formatting.
-- Inline expansion, keyboard navigation, loading, empty, and error states.
-- ESM, CommonJS, TypeScript declarations, isolated CSS, and SQL migration exports.
-- Unit, React accessibility, PostgreSQL integration, package-consumer, and CI checks.
-- Next.js App Router smoke example.
+- Initial activity engine, React panel, memory adapter, and PostgreSQL adapter.
 
-[Unreleased]: https://github.com/andreyshedko/activity/compare/v0.1.1...HEAD
+[0.2.1]: https://github.com/andreyshedko/activity/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/andreyshedko/activity/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/andreyshedko/activity/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/andreyshedko/activity/releases/tag/v0.1.0

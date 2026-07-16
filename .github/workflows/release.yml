@@ -37,6 +37,11 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
+          PACKAGE_SPEC=$(node -p "const p=require('./package.json'); p.name + '@' + p.version")
+          if npm view "$PACKAGE_SPEC" version >/dev/null 2>&1; then
+            echo "$PACKAGE_SPEC is already published; skipping the idempotent retry."
+            exit 0
+          fi
           if [[ "$RELEASE_TAG" == *-* ]]; then
             npm publish --provenance --access public --tag next
           else

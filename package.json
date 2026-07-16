@@ -2,7 +2,7 @@
   "name": "@feedclip/activity",
   "description": "Local-first activity history engine and React UI for business resources.",
   "license": "MIT",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "sideEffects": [
     "./dist/styles.css"
@@ -11,6 +11,7 @@
     "dist",
     "migrations",
     "README.md",
+    "CHANGELOG.md",
     "SECURITY.md",
     "COMPATIBILITY.md",
     "MIGRATIONS.md",
