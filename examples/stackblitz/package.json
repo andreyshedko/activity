@@ -8,7 +8,7 @@
     "build": "tsc --noEmit && vite build"
   },
   "dependencies": {
-    "@feedclip/activity": "0.2.0",
+    "@feedclip/activity": "0.2.1",
     "@vitejs/plugin-react": "5.1.4",
     "vite": "7.3.6",
     "react": "^19.0.0",
