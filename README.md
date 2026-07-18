@@ -1,10 +1,8 @@
 # Activity
 
 [![npm](https://img.shields.io/npm/v/@feedclip/activity)](https://www.npmjs.com/package/@feedclip/activity)
-[![CI](https://github.com/andreyshedko/activity/actions/workflows/ci.yml/badge.svg)](https://github.com/andreyshedko/activity/actions/workflows/ci.yml)
-[![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](./package.json)
 [![provenance](https://img.shields.io/badge/npm-provenance-verified-blue)](https://www.npmjs.com/package/@feedclip/activity)
-[![license](https://img.shields.io/npm/l/@feedclip/activity)](./LICENSE)
+[![license](https://img.shields.io/npm/l/@feedclip/activity)](https://github.com/andreyshedko/activity/blob/main/LICENSE)
 
 [Live demo](https://andreyshedko.github.io/activity/) ·
 [StackBlitz](https://stackblitz.com/github/andreyshedko/activity?file=examples%2Fstackblitz%2Fsrc%2FApp.tsx&startScript=stackblitz) ·
@@ -239,11 +237,11 @@ application, reauthorize the user, and generate a fresh short-lived URL:
 />
 ```
 
-See [`SECURITY.md`](./SECURITY.md) for data and attachment security guidance and
-[`COMPATIBILITY.md`](./COMPATIBILITY.md) for the supported runtime matrix.
-Public API compatibility and deprecation rules are documented in
-[`API_STABILITY.md`](./API_STABILITY.md). Release history is maintained in
-[`CHANGELOG.md`](./CHANGELOG.md).
+See the public [security guidance](https://github.com/andreyshedko/activity/blob/main/SECURITY.md),
+[runtime compatibility](https://github.com/andreyshedko/activity/blob/main/COMPATIBILITY.md),
+and [API stability policy](https://github.com/andreyshedko/activity/blob/main/API_STABILITY.md)
+on GitHub. Release history is maintained in the bundled
+[changelog](https://github.com/andreyshedko/activity/blob/main/CHANGELOG.md).
 
 ### Themes
 
@@ -309,7 +307,8 @@ const activity = createActivity({
 
 The migration is exported as `@feedclip/activity/migration.sql` and also lives
 at [`migrations/001_activity_schema.sql`](./migrations/001_activity_schema.sql).
-Deployment and upgrade rules are documented in [`MIGRATIONS.md`](./MIGRATIONS.md).
+Review the public [migration guidance](https://github.com/andreyshedko/activity/blob/main/MIGRATIONS.md)
+before applying database changes.
 
 ## Public entrypoints
 
@@ -317,39 +316,10 @@ Deployment and upgrade rules are documented in [`MIGRATIONS.md`](./MIGRATIONS.md
 - `@feedclip/activity/react` — `ActivityPanel`
 - `@feedclip/activity/adapters/memory`
 - `@feedclip/activity/adapters/postgres`
+- `@feedclip/activity/adapters/http`
+- `@feedclip/activity/http` — Fetch-compatible server handler
 - `@feedclip/activity/styles.css`
 - `@feedclip/activity/migration.sql`
-
-## Development
-
-```bash
-npm install
-npm test
-npm run test:e2e
-npm run benchmark:postgres
-npm run api:check
-npm run build
-npm run dev
-```
-
-`npm test` enforces 100% line, branch, and function coverage for the published
-engine, adapters, entrypoints, and React component. `npm run test:e2e` builds the
-production demo and runs the user-journey suite in Chromium, Firefox, and WebKit.
-
-The PostgreSQL integration suite runs when `DATABASE_URL` is set. The
-GitHub Actions workflow provides PostgreSQL automatically; without a database the
-integration test is reported as skipped while unit and React tests still run.
-
-Architecture and product decisions are documented in [`spec/README.md`](./spec/README.md).
-The [`examples/nextjs`](./examples/nextjs) app verifies the package, seeded
-activity history, and URL-backed detail selection in a Next.js App Router
-production build.
-
-Release preparation and publishing requirements are tracked in
-[`RELEASE_CHECKLIST.md`](./RELEASE_CHECKLIST.md). Publishing is performed by the
-GitHub Release workflow through the `@feedclip/activity` npm Trusted Publisher.
-The publisher is restricted to `andreyshedko/activity`, `release.yml`, and the
-`npm` GitHub environment; npm generates provenance automatically through OIDC.
 
 ## Status
 

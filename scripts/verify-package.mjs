@@ -34,13 +34,20 @@ try {
     "migrations/001_activity_schema.sql",
     "README.md",
     "CHANGELOG.md",
+    "LICENSE",
+  ];
+  const internalDocumentation = [
     "SECURITY.md",
     "COMPATIBILITY.md",
     "MIGRATIONS.md",
     "API_STABILITY.md",
+    "RELEASE_CHECKLIST.md",
   ];
 
   for (const file of required) assert(names.includes(file), `Package is missing ${file}`);
+  for (const file of internalDocumentation) {
+    assert(!names.includes(file), `Package contains internal documentation: ${file}`);
+  }
   assert(artifact.size <= 250_000, `Tarball is too large: ${artifact.size} bytes`);
   assert(artifact.unpackedSize <= 1_000_000, `Unpacked package is too large: ${artifact.unpackedSize} bytes`);
   assert(!names.some((name) => name.startsWith("src/") || name.startsWith("tests/") || name === ".env"), "Package contains development or environment files");

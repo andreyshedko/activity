@@ -3,6 +3,16 @@
 All notable changes to `@feedclip/activity` are documented here. The project
 follows [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] - 2026-07-18
+
+### Changed
+
+- Reduced the npm package documentation to the public consumer README,
+  changelog, license, runtime files, and database migration.
+- Moved security, compatibility, migration-policy, API-stability, development,
+  CI, and release-process details to GitHub instead of the npm package payload.
+- Added a package verification gate that rejects internal documentation files.
+
 ## [0.4.0] - 2026-07-18
 
 ### Added
@@ -80,6 +90,7 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Initial activity engine, React panel, memory adapter, and PostgreSQL adapter.
 
+[0.4.1]: https://github.com/andreyshedko/activity/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/andreyshedko/activity/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/andreyshedko/activity/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/andreyshedko/activity/compare/v0.2.0...v0.2.1
