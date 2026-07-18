@@ -1,10 +1,14 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 
 const declarationFiles = [
+  "dist/activity.d.ts",
+  "dist/ActivityPanel.d.ts",
   "dist/index.d.ts",
   "dist/react.d.ts",
   "dist/adapters/memory.d.ts",
   "dist/adapters/postgres.d.ts",
+  "dist/adapters/http.d.ts",
+  "dist/http.d.ts",
 ];
 const snapshotPath = "api/public-api.snapshot.txt";
 const sections = [];

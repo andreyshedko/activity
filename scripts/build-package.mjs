@@ -6,6 +6,8 @@ const entryPoints = {
   react: "src/react.ts",
   "adapters/memory": "src/adapters/memory.ts",
   "adapters/postgres": "src/adapters/postgres.ts",
+  "adapters/http": "src/adapters/http.ts",
+  http: "src/http.ts",
 };
 
 await rm("dist", { force: true, recursive: true });

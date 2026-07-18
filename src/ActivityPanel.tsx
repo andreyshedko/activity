@@ -54,6 +54,7 @@ export type ActivityPanelProps = {
   renderError?: (state: ActivityPanelErrorState) => ReactNode;
   entryActions?: readonly ActivityEntryAction[];
   onAttachmentOpen?: (attachment: Readonly<AttachmentContent>, entry: ActivityRecord) => void;
+  pageSize?: number;
 };
 
 type ActivityFilters = {
@@ -70,6 +71,8 @@ export type ActivityPanelQuery = {
   actor?: string;
   from?: Date;
   to?: Date;
+  limit?: number;
+  offset?: number;
 };
 
 type Filter = "all" | "updates" | "content" | "lifecycle";
@@ -115,6 +118,8 @@ const defaultMessages = {
   noMatchesHelp: "Try a broader search or a different action family.",
   loadError: "Activity could not load",
   retryLabel: "Try again",
+  loadMoreLabel: "Load more",
+  loadingMoreLabel: "Loading more activity",
   none: "None",
   moreChanges: "more changes",
   updated: "Updated",
@@ -144,6 +149,7 @@ export function ActivityPanel({
   renderError,
   entryActions = [],
   onAttachmentOpen,
+  pageSize,
 }: ActivityPanelProps) {
   const messages = { ...defaultMessages, ...messageOverrides };
   const actionLabels: Record<Filter, string> = {
@@ -161,6 +167,8 @@ export function ActivityPanel({
   const [filter, setFilter] = useState<Filter>("all");
   const [developerMode, setDeveloperMode] = useState(false);
   const [retryToken, setRetryToken] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const hasLoaded = useRef(controlledEntries !== undefined);
 
   const query = search ?? localSearch;
@@ -177,6 +185,7 @@ export function ActivityPanel({
       setEntries(controlledEntries);
       hasLoaded.current = true;
       setStatus("ready");
+      setHasMore(false);
       return;
     }
 
@@ -190,14 +199,16 @@ export function ActivityPanel({
       actor: filters?.actor,
       from: filters?.from,
       to: filters?.to,
+      limit: pageSize,
+      offset: 0,
     };
     onQueryChange?.(queryOptions);
 
-    activity
-      .query(queryOptions)
-      .then((nextEntries) => {
+    queryActivityPage(activity, queryOptions)
+      .then((result) => {
         if (!cancelled) {
-          setEntries(nextEntries);
+          setEntries(result.entries);
+          setHasMore(result.hasMore);
           hasLoaded.current = true;
           setStatus("ready");
         }
@@ -230,10 +241,38 @@ export function ActivityPanel({
     query,
     resource,
     retryToken,
+    pageSize,
   ]);
 
   const retry = () => setRetryToken((value) => value + 1);
   const hasQuery = query.trim().length > 0 || filter !== "all";
+  const loadMore = async () => {
+    const queryOptions: ActivityPanelQuery = {
+      resource,
+      search: query,
+      actions: activeActions,
+      actor: filters?.actor,
+      from: filters?.from,
+      to: filters?.to,
+      limit: pageSize,
+      offset: entries.length,
+    };
+    setLoadingMore(true);
+    onQueryChange?.(queryOptions);
+    try {
+      const result = await queryActivityPage(activity, queryOptions);
+      setEntries((current) => [...current, ...result.entries]);
+      setHasMore(result.hasMore);
+    } catch (unknownError) {
+      const nextError =
+        unknownError instanceof Error
+          ? unknownError
+          : new ActivityError("UNKNOWN_ERROR", "Activity could not load");
+      onError?.(nextError);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   return (
     <section
@@ -305,8 +344,9 @@ export function ActivityPanel({
       ) : null}
 
       {(status === "ready" || status === "refreshing") && entries.length > 0 ? (
-        <div className="activity-stream">
-          {entries.map((entry) => (
+        <>
+          <div className="activity-stream">
+            {entries.map((entry) => (
             <ActivityEntryRow
               developerMode={developerMode}
               entry={entry}
@@ -321,11 +361,31 @@ export function ActivityPanel({
               messages={messages}
               locale={locale}
             />
-          ))}
-        </div>
+            ))}
+          </div>
+          {hasMore ? (
+            <button
+              className="activity-load-more"
+              disabled={loadingMore}
+              onClick={() => void loadMore()}
+              type="button"
+            >
+              {loadingMore ? messages.loadingMoreLabel : messages.loadMoreLabel}
+            </button>
+          ) : null}
+        </>
       ) : null}
     </section>
   );
+}
+
+async function queryActivityPage(
+  activity: Activity,
+  options: ActivityPanelQuery,
+): Promise<{ entries: ActivityRecord[]; total: number; hasMore: boolean }> {
+  if (activity.queryPage) return activity.queryPage(options);
+  const entries = await activity.query(options);
+  return { entries, total: entries.length, hasMore: false };
 }
 
 function ActivityEntryRow({

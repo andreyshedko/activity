@@ -3,6 +3,25 @@
 All notable changes to `@feedclip/activity` are documented here. The project
 follows [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-07-18
+
+### Added
+
+- Added `httpAdapter()` for browser-safe access to Activity APIs.
+- Added `createActivityHttpHandler()` with required per-request authorization and
+  server-side validation for standard Fetch runtimes.
+- Added backward-compatible `queryPage()` access to `entries`, `total`, and
+  `hasMore`.
+- Added `ActivityPanel` pagination through `pageSize` and an accessible Load more
+  flow.
+- Added a Next.js App Router browser → route handler → PostgreSQL example.
+- Added GitHub Pages deployment for the interactive product demo.
+
+### Changed
+
+- Updated StackBlitz to the published `0.3.0` package and its deep-link API.
+- Added npm, CI, coverage, provenance, and license signals to the README.
+
 ## [0.3.0] - 2026-07-18
 
 ### Added
@@ -61,6 +80,7 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Initial activity engine, React panel, memory adapter, and PostgreSQL adapter.
 
+[0.4.0]: https://github.com/andreyshedko/activity/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/andreyshedko/activity/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/andreyshedko/activity/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/andreyshedko/activity/compare/v0.1.1...v0.2.0

@@ -66,6 +66,10 @@ test("track returns the normalized ActivityRecord and persists it", async () => 
   });
 
   assert.deepEqual(entries, [record]);
+  assert.deepEqual(
+    await activity.queryPage?.({ resource: invoice, limit: 1, offset: 0 }),
+    { entries: [record], total: 1, hasMore: false },
+  );
 });
 
 test("query isolates records by resource type and id", async () => {

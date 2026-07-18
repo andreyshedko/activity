@@ -24,7 +24,7 @@ await build({
 const sourceHtml = await readFile("index.html", "utf8");
 const html = sourceHtml.replace(
   '<script type="module" src="/src/main.tsx"></script>',
-  '<link rel="stylesheet" href="/assets/main.css" />\n    <script type="module" src="/assets/main.js"></script>',
+  '<link rel="stylesheet" href="./assets/main.css" />\n    <script type="module" src="./assets/main.js"></script>',
 );
 
 await writeFile("demo-dist/index.html", html);

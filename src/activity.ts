@@ -129,6 +129,7 @@ export type StorageAdapter = {
 export type Activity = {
   track(input: TrackInput): Promise<ActivityRecord>;
   query(options: QueryOptions): Promise<ActivityRecord[]>;
+  queryPage?(options: QueryOptions): Promise<QueryResult>;
 };
 
 export type ActivityOptions = {
@@ -166,6 +167,10 @@ export function createActivity({
       const normalized = normalizeQuery(options);
       const result = await adapter.query(normalized);
       return result.entries;
+    },
+    async queryPage(options) {
+      const normalized = normalizeQuery(options);
+      return adapter.query(normalized);
     },
   };
 }

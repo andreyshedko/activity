@@ -1,3 +1,236 @@
+## dist/activity.d.ts
+
+export type ActorType = "user" | "system" | "api" | "agent";
+export type BuiltInAction = "create" | "update" | "delete" | "archive" | "restore" | "comment" | "attachment";
+export type Action = BuiltInAction | (string & {});
+export type ValueType = "string" | "number" | "boolean" | "date" | "currency" | "user" | "enum" | "json" | "custom";
+export type Resource = {
+    type: string;
+    id: string;
+    title?: string;
+};
+export type ResourceReference = Pick<Resource, "type" | "id"> & {
+    title?: string;
+};
+export type Actor = {
+    type: ActorType;
+    id: string;
+    name: string;
+    avatarUrl?: string;
+};
+export type Change = {
+    field: string;
+    label: string;
+    before?: unknown;
+    after?: unknown;
+    valueType: ValueType;
+};
+export type CommentContent = {
+    type: "comment";
+    text: string;
+};
+export type AttachmentContent = {
+    type: "attachment";
+    fileName: string;
+    mimeType: string;
+    size: number;
+    url?: string;
+};
+export type AttachmentPolicy = {
+    maxSizeBytes?: number;
+    allowedMimeTypes?: readonly string[];
+    allowedUrlProtocols?: readonly string[];
+};
+export type CustomContent = {
+    type: "custom";
+    [key: string]: unknown;
+};
+export type Content = CommentContent | AttachmentContent | CustomContent;
+export type Metadata = {
+    source?: string;
+    version?: string;
+    requestId?: string;
+    ipAddress?: string;
+    custom?: Record<string, unknown>;
+    [key: string]: unknown;
+};
+export type ActivityRecord = Readonly<{
+    id: string;
+    resource: Readonly<Resource>;
+    action: Action;
+    actor: Readonly<Actor>;
+    timestamp: Date;
+    changes?: readonly Readonly<Change>[];
+    content?: Readonly<Content>;
+    metadata?: Readonly<Metadata>;
+}>;
+export type TrackInput = {
+    resource: ResourceReference;
+    actor: Actor;
+    action: Action;
+    changes?: Change[];
+    content?: Content;
+    metadata?: Metadata;
+    timestamp?: Date;
+};
+export type QueryOptions = {
+    resource: ResourceReference;
+    search?: string;
+    actor?: string;
+    actorId?: string;
+    actions?: readonly Action[];
+    from?: Date;
+    to?: Date;
+    limit?: number;
+    offset?: number;
+};
+export type QueryResult = {
+    entries: ActivityRecord[];
+    total: number;
+    hasMore: boolean;
+};
+export type StorageAdapter = {
+    insert(entry: ActivityRecord): Promise<void>;
+    query(options: QueryOptions): Promise<QueryResult>;
+};
+export type Activity = {
+    track(input: TrackInput): Promise<ActivityRecord>;
+    query(options: QueryOptions): Promise<ActivityRecord[]>;
+    queryPage?(options: QueryOptions): Promise<QueryResult>;
+};
+export type ActivityOptions = {
+    adapter: StorageAdapter;
+    clock?: () => Date;
+    idGenerator?: () => string;
+    attachmentPolicy?: AttachmentPolicy;
+};
+export declare class ActivityError extends Error {
+    readonly code: string;
+    readonly field?: string;
+    constructor(code: string, message: string, field?: string);
+}
+export declare function createActivity({ adapter, clock, idGenerator, attachmentPolicy, }: ActivityOptions): Activity;
+export declare function createMemoryStorageAdapter(initialEntries?: ActivityRecord[], latency?: number): StorageAdapter;
+type Queryable = {
+    query(sql: string, params?: readonly unknown[]): Promise<{
+        rows: unknown[];
+    }>;
+};
+type ReleasableQueryable = Queryable & {
+    release(): void;
+};
+type Connectable = Queryable & {
+    connect(): Promise<ReleasableQueryable>;
+};
+export declare function postgresAdapter(client: Queryable | Connectable): StorageAdapter;
+export {};
+//# sourceMappingURL=activity.d.ts.map
+
+## dist/ActivityPanel.d.ts
+
+import React, { type ReactNode } from "react";
+import { type Action, type Activity, type ActivityRecord, type AttachmentContent, type ResourceReference } from "./activity";
+export type ActivityPanelMessages = {
+    [Key in keyof typeof defaultMessages]: string;
+};
+export type ActivityPanelTheme = "light" | "dark" | "system";
+export type ActivityPanelVariant = "default" | "compact" | "comfortable";
+export type ActivityPanelEmptyState = {
+    hasQuery: boolean;
+};
+export type ActivityPanelErrorState = {
+    error: Error;
+    retry: () => void;
+};
+export type ActivityEntryAction = {
+    id: string;
+    label: string;
+    icon?: ReactNode;
+    onSelect: (entry: ActivityRecord) => void;
+    isVisible?: (entry: ActivityRecord) => boolean;
+    isDisabled?: (entry: ActivityRecord) => boolean;
+};
+export type ActivityPanelProps = {
+    activity: Activity;
+    resource: ResourceReference;
+    entries?: ActivityRecord[];
+    search?: string;
+    filters?: ActivityFilters;
+    variant?: ActivityPanelVariant;
+    theme?: ActivityPanelTheme;
+    onEntryClick?: (entry: ActivityRecord) => void;
+    expandedEntryId?: string | null;
+    onExpandedEntryChange?: (entryId: string | null, entry: ActivityRecord) => void;
+    onError?: (error: Error) => void;
+    onQueryChange?: (query: ActivityPanelQuery) => void;
+    messages?: Partial<ActivityPanelMessages>;
+    locale?: string;
+    renderEmpty?: (state: ActivityPanelEmptyState) => ReactNode;
+    renderError?: (state: ActivityPanelErrorState) => ReactNode;
+    entryActions?: readonly ActivityEntryAction[];
+    onAttachmentOpen?: (attachment: Readonly<AttachmentContent>, entry: ActivityRecord) => void;
+    pageSize?: number;
+};
+type ActivityFilters = {
+    actions?: readonly Action[];
+    actor?: string;
+    from?: Date;
+    to?: Date;
+};
+export type ActivityPanelQuery = {
+    resource: ResourceReference;
+    search?: string;
+    actions?: readonly Action[];
+    actor?: string;
+    from?: Date;
+    to?: Date;
+    limit?: number;
+    offset?: number;
+};
+declare const defaultMessages: {
+    readonly panelLabel: "Activity history";
+    readonly title: "Activity";
+    readonly developer: "Developer";
+    readonly searchLabel: "Search activity";
+    readonly searchPlaceholder: "Search...";
+    readonly filterLabel: "Filter by action family";
+    readonly filterAll: "All";
+    readonly filterUpdates: "Updates";
+    readonly filterContent: "Content";
+    readonly filterLifecycle: "Lifecycle";
+    readonly loadingLabel: "Loading activity";
+    readonly refreshingLabel: "Refreshing activity";
+    readonly entryActionsLabel: "Entry actions";
+    readonly copyIdLabel: "Copy activity id";
+    readonly copyIdTitle: "Copy ID";
+    readonly openAttachmentLabel: "Open attachment";
+    readonly changedBy: "Changed by";
+    readonly at: "At";
+    readonly source: "Source";
+    readonly version: "Version";
+    readonly application: "Application";
+    readonly unversioned: "Unversioned";
+    readonly noActivity: "No activity yet";
+    readonly noMatches: "No matching activity";
+    readonly noActivityHelp: "Tracked entries for this resource will appear here.";
+    readonly noMatchesHelp: "Try a broader search or a different action family.";
+    readonly loadError: "Activity could not load";
+    readonly retryLabel: "Try again";
+    readonly loadMoreLabel: "Load more";
+    readonly loadingMoreLabel: "Loading more activity";
+    readonly none: "None";
+    readonly moreChanges: "more changes";
+    readonly updated: "Updated";
+    readonly updatedSuffix: "updated";
+    readonly comment: "Comment";
+    readonly attachment: "Attachment";
+    readonly reason: "Reason";
+    readonly createdSuffix: "created";
+};
+export declare function ActivityPanel({ activity, resource, entries: controlledEntries, filters, onEntryClick, expandedEntryId, onExpandedEntryChange, onError, onQueryChange, search, theme, variant, messages: messageOverrides, locale, renderEmpty, renderError, entryActions, onAttachmentOpen, pageSize, }: ActivityPanelProps): React.JSX.Element;
+export {};
+//# sourceMappingURL=ActivityPanel.d.ts.map
+
 ## dist/index.d.ts
 
 export { ActivityError, createActivity, createMemoryStorageAdapter, type Action, type Activity, type ActivityOptions, type ActivityRecord, type Actor, type ActorType, type AttachmentContent, type AttachmentPolicy, type BuiltInAction, type Change, type CommentContent, type Content, type CustomContent, type Metadata, type QueryOptions, type QueryResult, type Resource, type ResourceReference, type StorageAdapter, type TrackInput, type ValueType, } from "./activity";
@@ -17,4 +250,33 @@ export { createMemoryStorageAdapter } from "../activity";
 
 export { postgresAdapter } from "../activity";
 //# sourceMappingURL=postgres.d.ts.map
+
+## dist/adapters/http.d.ts
+
+import { type StorageAdapter } from "../activity";
+export type ActivityFetch = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+export type HttpAdapterOptions = {
+    endpoint: string;
+    fetch?: ActivityFetch;
+    headers?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>);
+};
+export declare function httpAdapter({ endpoint, fetch: fetchImplementation, headers, }: HttpAdapterOptions): StorageAdapter;
+//# sourceMappingURL=http.d.ts.map
+
+## dist/http.d.ts
+
+import { type ResourceReference, type StorageAdapter } from "./activity";
+export type ActivityHttpOperation = "query" | "insert";
+export type ActivityHttpAuthorization = {
+    request: Request;
+    operation: ActivityHttpOperation;
+    resource: ResourceReference;
+};
+export type ActivityHttpHandlerOptions = {
+    adapter: StorageAdapter;
+    authorize: (context: ActivityHttpAuthorization) => boolean | Promise<boolean>;
+    onError?: (error: Error, request: Request) => void;
+};
+export declare function createActivityHttpHandler({ adapter, authorize, onError, }: ActivityHttpHandlerOptions): (request: Request) => Promise<Response>;
+//# sourceMappingURL=http.d.ts.map
 

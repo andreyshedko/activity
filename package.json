@@ -9,7 +9,7 @@
     "timeline"
   ],
   "license": "MIT",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "sideEffects": [
     "./dist/styles.css"
@@ -48,6 +48,16 @@
       "import": "./dist/adapters/postgres.js",
       "require": "./dist/adapters/postgres.cjs"
     },
+    "./adapters/http": {
+      "types": "./dist/adapters/http.d.ts",
+      "import": "./dist/adapters/http.js",
+      "require": "./dist/adapters/http.cjs"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js",
+      "require": "./dist/http.cjs"
+    },
     "./styles.css": "./dist/styles.css",
     "./migration.sql": "./migrations/001_activity_schema.sql"
   },
@@ -61,7 +71,7 @@
     "preview": "python3 -m http.server 4173 --bind 127.0.0.1 --directory demo-dist",
     "test": "npm run test:coverage",
     "test:unit": "node --import tsx --test tests/*.test.ts tests/*.test.tsx",
-    "test:coverage": "node --import tsx --experimental-test-coverage --test-coverage-include=src/activity.ts --test-coverage-include=src/ActivityPanel.tsx --test-coverage-include=src/index.ts --test-coverage-include=src/react.ts --test-coverage-include=src/adapters/*.ts --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 --test tests/*.test.ts tests/*.test.tsx",
+    "test:coverage": "node --import tsx --experimental-test-coverage --test-coverage-include=src/activity.ts --test-coverage-include=src/ActivityPanel.tsx --test-coverage-include=src/index.ts --test-coverage-include=src/react.ts --test-coverage-include=src/http.ts --test-coverage-include=src/adapters/*.ts --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 --test tests/*.test.ts tests/*.test.tsx",
     "test:e2e": "npm run build:demo && playwright test",
     "test:package": "node scripts/verify-package.mjs",
     "benchmark:postgres": "npm run build:sdk && node scripts/benchmark-postgres.mjs",

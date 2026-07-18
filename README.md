@@ -1,5 +1,15 @@
 # Activity
 
+[![npm](https://img.shields.io/npm/v/@feedclip/activity)](https://www.npmjs.com/package/@feedclip/activity)
+[![CI](https://github.com/andreyshedko/activity/actions/workflows/ci.yml/badge.svg)](https://github.com/andreyshedko/activity/actions/workflows/ci.yml)
+[![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](./package.json)
+[![provenance](https://img.shields.io/badge/npm-provenance-verified-blue)](https://www.npmjs.com/package/@feedclip/activity)
+[![license](https://img.shields.io/npm/l/@feedclip/activity)](./LICENSE)
+
+[Live demo](https://andreyshedko.github.io/activity/) ·
+[StackBlitz](https://stackblitz.com/github/andreyshedko/activity?file=examples%2Fstackblitz%2Fsrc%2FApp.tsx&startScript=stackblitz) ·
+[npm](https://www.npmjs.com/package/@feedclip/activity)
+
 Drop-in activity history for React applications, backed by a framework-independent
 engine and your own storage. Ship searchable, accessible audit trails for invoices,
 customers, tickets, orders, and other business resources without rebuilding the UI.
@@ -145,6 +155,59 @@ const [expandedEntryId, setExpandedEntryId] = useState<string | null>(
 Every rendered record also receives a stable DOM target in the form
 `activity-entry-{record.id}`. Without `expandedEntryId`, expansion remains local
 and multiple records can be opened independently, preserving existing behavior.
+
+### Browser-to-server HTTP adapter
+
+Keep PostgreSQL credentials on the server. The browser uses the HTTP adapter:
+
+```tsx
+import { createActivity } from "@feedclip/activity";
+import { httpAdapter } from "@feedclip/activity/adapters/http";
+
+const activity = createActivity({
+  adapter: httpAdapter({
+    endpoint: "/api/activity",
+    headers: () => ({ authorization: `Bearer ${getSessionToken()}` }),
+  }),
+});
+
+<ActivityPanel activity={activity} pageSize={20} resource={resource} />;
+```
+
+On a server with the standard Fetch API, connect the same endpoint to storage:
+
+```ts
+import { postgresAdapter } from "@feedclip/activity/adapters/postgres";
+import { createActivityHttpHandler } from "@feedclip/activity/http";
+
+const handleActivity = createActivityHttpHandler({
+  adapter: postgresAdapter(db),
+  authorize: async ({ request, operation, resource }) => {
+    const session = await requireSession(request);
+    return canAccessResource(session, operation, resource);
+  },
+});
+
+export const GET = handleActivity;
+export const POST = handleActivity;
+```
+
+`authorize` is required and runs before every query or insert. The handler
+revalidates incoming records rather than trusting browser payloads. See the
+[`examples/nextjs`](./examples/nextjs) browser → route handler → PostgreSQL flow.
+
+### Pagination
+
+`activity.query()` remains compatible and returns an array. Use `queryPage()`
+when totals and continuation state are required:
+
+```ts
+const page = await activity.queryPage?.({ resource, limit: 20, offset: 0 });
+// { entries, total, hasMore }
+```
+
+`ActivityPanel pageSize={20}` renders an accessible **Load more** action and
+appends subsequent pages without replacing entries already on screen.
 
 ### Attachments
 

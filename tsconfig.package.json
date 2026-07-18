@@ -14,6 +14,7 @@
     "src/ActivityPanel.tsx",
     "src/index.ts",
     "src/react.ts",
+    "src/http.ts",
     "src/adapters/**/*.ts"
   ]
 }

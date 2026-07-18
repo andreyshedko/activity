@@ -26,6 +26,10 @@ try {
     "dist/index.d.ts",
     "dist/react.js",
     "dist/react.cjs",
+    "dist/adapters/http.js",
+    "dist/adapters/http.cjs",
+    "dist/http.js",
+    "dist/http.cjs",
     "dist/styles.css",
     "migrations/001_activity_schema.sql",
     "README.md",
@@ -54,10 +58,14 @@ try {
     import * as activity from "@feedclip/activity";
     import { ActivityPanel } from "@feedclip/activity/react";
     import { createMemoryStorageAdapter } from "@feedclip/activity/adapters/memory";
+    import { httpAdapter } from "@feedclip/activity/adapters/http";
+    import { createActivityHttpHandler } from "@feedclip/activity/http";
     import { createElement } from "react";
     import { renderToStaticMarkup } from "react-dom/server";
     assert.equal(typeof activity.createActivity, "function");
     assert.equal(typeof createMemoryStorageAdapter, "function");
+    assert.equal(typeof httpAdapter, "function");
+    assert.equal(typeof createActivityHttpHandler, "function");
     const client = activity.createActivity({ adapter: createMemoryStorageAdapter() });
     assert.match(renderToStaticMarkup(createElement(ActivityPanel, {
       activity: client,
@@ -76,6 +84,8 @@ try {
     assert.equal(typeof require("@feedclip/activity").createActivity, "function");
     assert.equal(typeof require("@feedclip/activity/react").ActivityPanel, "function");
     assert.equal(typeof require("@feedclip/activity/adapters/postgres").postgresAdapter, "function");
+    assert.equal(typeof require("@feedclip/activity/adapters/http").httpAdapter, "function");
+    assert.equal(typeof require("@feedclip/activity/http").createActivityHttpHandler, "function");
   `);
   run("node", ["verify.cjs"], work);
   await rm(tarball, { force: true });

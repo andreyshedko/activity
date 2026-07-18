@@ -24,6 +24,15 @@ test("searches and filters the activity stream", async ({ page }) => {
   await expect(panel.getByText("Status", { exact: true })).not.toBeVisible();
 });
 
+test("loads the next activity page without replacing visible entries", async ({ page }) => {
+  const panel = page.getByRole("region", { name: "Activity history" });
+  await expect(panel.getByText("Duplicate invoice")).not.toBeVisible();
+  await panel.getByRole("button", { name: "Load more" }).click();
+  await expect(panel.getByText("Reason: Duplicate invoice")).toBeVisible();
+  await expect(panel.getByText("Status", { exact: true }).first()).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Load more" })).not.toBeVisible();
+});
+
 test("switches resources without leaking entries", async ({ page }) => {
   await page.getByRole("button", { name: /customer Northstar Supply/i }).click();
   await expect(page.getByRole("heading", { name: "Northstar Supply" })).toBeVisible();

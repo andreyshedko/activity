@@ -306,6 +306,7 @@ await activity.track({
             onAttachmentOpen={(attachment) => setOpenedAttachment(attachment.fileName)}
             onExpandedEntryChange={selectEntry}
             onQueryChange={setLastQuery}
+            pageSize={4}
             resource={selectedResource.resource}
             theme={theme}
           />

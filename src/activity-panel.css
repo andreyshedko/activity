@@ -615,6 +615,28 @@ ins {
   }
 }
 
+.activity-load-more {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--activity-color-border);
+  border-radius: 10px;
+  background: var(--activity-color-surface);
+  color: var(--activity-color-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.activity-load-more:hover:not(:disabled) {
+  background: var(--activity-color-hover);
+}
+
+.activity-load-more:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 @media (max-width: 620px) {
   .activity-toolbar,
   .activity-panel__header {

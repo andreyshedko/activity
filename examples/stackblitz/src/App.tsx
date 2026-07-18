@@ -10,6 +10,7 @@ export function App() {
     [],
   );
   const [ready, setReady] = useState(false);
+  const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
 
   useEffect(() => {
     void activity.track({
@@ -34,7 +35,17 @@ export function App() {
         <code>npm install @feedclip/activity</code>
       </header>
       {ready ? (
-        <ActivityPanel activity={activity} resource={resource} />
+        <ActivityPanel
+          activity={activity}
+          expandedEntryId={expandedEntryId}
+          onExpandedEntryChange={(entryId) => {
+            setExpandedEntryId(entryId);
+            const url = new URL(window.location.href);
+            entryId ? url.searchParams.set("activity", entryId) : url.searchParams.delete("activity");
+            window.history.replaceState(null, "", url);
+          }}
+          resource={resource}
+        />
       ) : (
         <p role="status">Creating example activity…</p>
       )}

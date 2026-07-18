@@ -78,6 +78,7 @@
 | `onEntryClick` | Вызывается при клике на запись |
 | `expandedEntryId` | Controlled ID раскрытой записи; `null` закрывает все записи |
 | `onExpandedEntryChange` | Вызывается с ID записи или `null`; позволяет синхронизировать detail view с URL |
+| `pageSize` | Размер страницы; при `hasMore` панель показывает доступное действие Load more |
 | `onError` | Вызывается при ошибке загрузки |
 | `messages` | Частичное переопределение всех системных UI-сообщений |
 | `locale` | BCP 47 locale для форматирования дат и времени через `Intl.DateTimeFormat` |

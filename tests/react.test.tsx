@@ -345,6 +345,80 @@ test("controls expanded entries for URL-backed detail views", () => {
   assert.equal(screen.queryByRole("button", { expanded: true }), null);
 });
 
+test("loads paginated activity without replacing the current page", async () => {
+  const offsets: Array<number | undefined> = [];
+  const emittedOffsets: Array<number | undefined> = [];
+  const paginatedActivity: Activity = {
+    async track() { throw new Error("not used"); },
+    async query() { throw new Error("queryPage should be preferred"); },
+    async queryPage(options) {
+      offsets.push(options.offset);
+      return options.offset === 1
+        ? { entries: [secondEntry], total: 2, hasMore: false }
+        : { entries: [entry], total: 2, hasMore: true };
+    },
+  };
+
+  render(
+    <ActivityPanel
+      activity={paginatedActivity}
+      filters={{
+        actor: "usr_1",
+        from: new Date("2026-01-01T00:00:00.000Z"),
+        to: new Date("2026-12-31T00:00:00.000Z"),
+      }}
+      messages={{ loadMoreLabel: "More history", loadingMoreLabel: "Loading history" }}
+      onQueryChange={(query) => emittedOffsets.push(query.offset)}
+      pageSize={1}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+
+  const loadMore = await screen.findByRole("button", { name: "More history" });
+  fireEvent.click(loadMore);
+  assert.ok(await screen.findByText("Ready for payment"));
+  assert.deepEqual(offsets, [0, 1]);
+  assert.deepEqual(emittedOffsets, [0, 1]);
+  assert.equal(screen.queryByRole("button", { name: "More history" }), null);
+});
+
+test("keeps paginated entries visible when loading another page fails", async () => {
+  const errors: string[] = [];
+  let resolveFailure!: () => void;
+  let failures = 0;
+  const paginatedActivity: Activity = {
+    async track() { throw new Error("not used"); },
+    async query() { return []; },
+    async queryPage(options) {
+      if (options.offset === 0) return { entries: [entry], total: 2, hasMore: true };
+      await new Promise<void>((resolve) => { resolveFailure = resolve; });
+      failures += 1;
+      throw failures === 1 ? "offline" : new Error("Still offline");
+    },
+  };
+
+  render(
+    <ActivityPanel
+      activity={paginatedActivity}
+      onError={(error) => errors.push(error.message)}
+      pageSize={1}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  const button = await screen.findByRole("button", { name: "Load more" });
+  fireEvent.click(button);
+  assert.equal(screen.getByRole("button", { name: "Loading more activity" }).hasAttribute("disabled"), true);
+  resolveFailure();
+  assert.ok(await screen.findByRole("button", { name: "Load more" }));
+  assert.deepEqual(errors, ["Activity could not load"]);
+  assert.ok(screen.getAllByText("Status", { exact: true }).length > 0);
+
+  fireEvent.click(screen.getByRole("button", { name: "Load more" }));
+  resolveFailure();
+  assert.ok(await screen.findByRole("button", { name: "Load more" }));
+  assert.deepEqual(errors, ["Activity could not load", "Still offline"]);
+});
+
 test("local search and action-family controls emit normalized panel queries", async () => {
   const queries: Array<{ search?: string; actions?: readonly string[] }> = [];
   const queryActivity: Activity = {
@@ -432,6 +506,28 @@ test("non-Error query failures are normalized and reported", async () => {
   );
   assert.ok(await screen.findByRole("heading", { name: "Activity could not load" }));
   assert.equal(reported?.message, "Activity could not load");
+});
+
+test("ignores a query failure after the panel unmounts", async () => {
+  let rejectQuery!: (error: unknown) => void;
+  const errors: Error[] = [];
+  const pendingActivity: Activity = {
+    async track() { throw new Error("not used"); },
+    async query() {
+      return new Promise<ActivityRecord[]>((_, reject) => { rejectQuery = reject; });
+    },
+  };
+  const view = render(
+    <ActivityPanel
+      activity={pendingActivity}
+      onError={(error) => errors.push(error)}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  view.unmount();
+  rejectQuery(new Error("late failure"));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(errors, []);
 });
 
 test("custom icons, copy, and fallback metadata remain accessible", () => {

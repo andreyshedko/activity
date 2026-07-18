@@ -73,6 +73,7 @@ const activity = createActivity({
 interface Activity {
     track(...): Promise<ActivityRecord>
     query(...)
+    queryPage?(...): Promise<QueryResult>
 }
 ```
 
@@ -148,7 +149,11 @@ const entries = await activity.query({
 });
 ```
 
-> **Примечание:** `query()` возвращает `Promise<ActivityEntry[]>` напрямую, тогда как `StorageAdapter.query()` (см. [`storage.md`](./storage.md) §6) возвращает `Promise<QueryResult>` (содержащий `entries`, `total`, `hasMore`). Публичный `Activity.query()` — упрощённая проекция поверх внутреннего `QueryResult`; `total`/`hasMore` на этом уровне не экспонируются в v1.
+> **Примечание:** `query()` сохраняет простой совместимый результат
+> `Promise<ActivityEntry[]>`. Созданные через `createActivity()` экземпляры также
+> предоставляют additive `queryPage()` с полным `QueryResult` (`entries`, `total`,
+> `hasMore`). Метод типизирован как опциональный, чтобы существующие пользовательские
+> реализации интерфейса `Activity` оставались совместимыми.
 
 ## 9. Query Options
 
