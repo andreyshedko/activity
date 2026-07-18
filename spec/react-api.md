@@ -63,6 +63,11 @@ Version 1.0 экспортирует:
 
 `ActivityPanel` МОЖЕТ принимать `search`/`filters` как controlled props (см. [`activity-panel.md`](./activity-panel.md) §5) — значения для них может поставлять `ActivitySearch`/`ActivityFilters` (см. §8–9 ниже), но эти компоненты не обязаны использоваться вместе с `ActivityPanel`.
 
+`expandedEntryId` и `onExpandedEntryChange` образуют опциональную controlled-модель
+detail view. Приложение может хранить ID выбранной записи в URL и тем самым
+реализовать deep links без зависимости Activity от конкретного роутера. Если
+`expandedEntryId` не передан, каждая запись управляет раскрытием локально.
+
 ## 7. `ActivityEntry`
 
 **Назначение:** отрендерить одну Activity Entry.

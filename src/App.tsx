@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityPanel,
   type ActivityPanelQuery,
@@ -29,6 +29,7 @@ export function App() {
   });
   const [adapterMode, setAdapterMode] = useState<AdapterMode>("memory");
   const [openedAttachment, setOpenedAttachment] = useState<string | null>(null);
+  const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
   const selectedResource =
     demoResources.find((item) => item.resource.id === selectedResourceId) ??
     demoResources[0];
@@ -55,6 +56,29 @@ export function App() {
 
     return createActivity({ adapter });
   }, [state]);
+
+  useEffect(() => {
+    const readHash = () => {
+      const prefix = "#activity-entry-";
+      setExpandedEntryId(
+        window.location.hash.startsWith(prefix)
+          ? decodeURIComponent(window.location.hash.slice(prefix.length))
+          : null,
+      );
+    };
+
+    readHash();
+    window.addEventListener("hashchange", readHash);
+    return () => window.removeEventListener("hashchange", readHash);
+  }, []);
+
+  const selectEntry = (entryId: string | null) => {
+    setExpandedEntryId(entryId);
+    const hash = entryId
+      ? `#activity-entry-${encodeURIComponent(entryId)}`
+      : `${window.location.pathname}${window.location.search}`;
+    window.history.replaceState(null, "", hash);
+  };
   const trackExample = async () => {
     setIsTracking(true);
     try {
@@ -101,8 +125,8 @@ export function App() {
     <main className="app-shell">
       <header className="workspace-topbar">
         <div>
-          <strong>Activity Platform</strong>
-          <span>Resource history infrastructure</span>
+          <strong>Activity History</strong>
+          <span>Drop-in audit trails for React applications</span>
         </div>
         <div className="demo-controls" aria-label="Demo state">
           {(["default", "loading", "empty", "error"] as DemoState[]).map((item) => (
@@ -277,8 +301,10 @@ await activity.track({
         <div className="activity-column">
           <ActivityPanel
             activity={activity}
+            expandedEntryId={expandedEntryId}
             key={`${selectedResource.resource.type}:${selectedResource.resource.id}:${refreshToken}`}
             onAttachmentOpen={(attachment) => setOpenedAttachment(attachment.fileName)}
+            onExpandedEntryChange={selectEntry}
             onQueryChange={setLastQuery}
             resource={selectedResource.resource}
             theme={theme}

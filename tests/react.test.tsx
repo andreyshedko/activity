@@ -311,6 +311,40 @@ test("defensively renders update entries without changes", () => {
   assert.equal(screen.getAllByText("Updated").length, 2);
 });
 
+test("controls expanded entries for URL-backed detail views", () => {
+  const changes: Array<{ id: string | null; entry: string }> = [];
+  const { rerender } = render(
+    <ActivityPanel
+      activity={activity}
+      entries={[entry, secondEntry]}
+      expandedEntryId="evt_2"
+      onExpandedEntryChange={(id, selected) => changes.push({ id, entry: selected.id })}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+
+  const toggles = screen.getAllByRole("button", { expanded: false });
+  assert.equal(document.querySelector("#activity-entry-evt_2") !== null, true);
+  assert.equal(screen.getByRole("button", { expanded: true }).closest("article")?.id, "activity-entry-evt_2");
+
+  fireEvent.click(toggles[0]);
+  assert.deepEqual(changes.at(-1), { id: "evt_1", entry: "evt_1" });
+
+  const expanded = screen.getByRole("button", { expanded: true });
+  fireEvent.keyDown(expanded, { key: "Escape" });
+  assert.deepEqual(changes.at(-1), { id: null, entry: "evt_2" });
+
+  rerender(
+    <ActivityPanel
+      activity={activity}
+      entries={[entry, secondEntry]}
+      expandedEntryId={null}
+      resource={{ type: "invoice", id: "inv_1" }}
+    />,
+  );
+  assert.equal(screen.queryByRole("button", { expanded: true }), null);
+});
+
 test("local search and action-family controls emit normalized panel queries", async () => {
   const queries: Array<{ search?: string; actions?: readonly string[] }> = [];
   const queryActivity: Activity = {

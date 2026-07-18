@@ -1,7 +1,8 @@
 # Activity
 
-Local-first activity history engine and React UI for business resources such as
-invoices, customers, tickets, and orders.
+Drop-in activity history for React applications, backed by a framework-independent
+engine and your own storage. Ship searchable, accessible audit trails for invoices,
+customers, tickets, orders, and other business resources without rebuilding the UI.
 
 Activity History is the product; the framework-independent Activity Engine is the
 architecture underneath it.
@@ -116,6 +117,34 @@ callback receives the immutable `ActivityRecord` for that row:
 
 Actions are keyboard-accessible. Supply `icon` with any React node when an icon
 is preferred; `label` remains the accessible name and tooltip.
+
+### Detail views and deep links
+
+Use `expandedEntryId` when the selected event belongs in the URL. Activity keeps
+the detail view accessible and inline; the host application remains in control of
+routing:
+
+```tsx
+const [expandedEntryId, setExpandedEntryId] = useState<string | null>(
+  new URLSearchParams(location.search).get("activity"),
+);
+
+<ActivityPanel
+  activity={activity}
+  expandedEntryId={expandedEntryId}
+  onExpandedEntryChange={(entryId) => {
+    setExpandedEntryId(entryId);
+    const url = new URL(location.href);
+    entryId ? url.searchParams.set("activity", entryId) : url.searchParams.delete("activity");
+    history.replaceState(null, "", url);
+  }}
+  resource={{ type: "invoice", id: "inv_123" }}
+/>
+```
+
+Every rendered record also receives a stable DOM target in the form
+`activity-entry-{record.id}`. Without `expandedEntryId`, expansion remains local
+and multiple records can be opened independently, preserving existing behavior.
 
 ### Attachments
 
@@ -242,15 +271,16 @@ npm run dev
 
 `npm test` enforces 100% line, branch, and function coverage for the published
 engine, adapters, entrypoints, and React component. `npm run test:e2e` builds the
-production demo and runs the Chromium user-journey suite with Playwright.
+production demo and runs the user-journey suite in Chromium, Firefox, and WebKit.
 
 The PostgreSQL integration suite runs when `DATABASE_URL` is set. The
 GitHub Actions workflow provides PostgreSQL automatically; without a database the
 integration test is reported as skipped while unit and React tests still run.
 
 Architecture and product decisions are documented in [`spec/README.md`](./spec/README.md).
-The [`examples/nextjs`](./examples/nextjs) app verifies the package in a Next.js
-App Router production build.
+The [`examples/nextjs`](./examples/nextjs) app verifies the package, seeded
+activity history, and URL-backed detail selection in a Next.js App Router
+production build.
 
 Release preparation and publishing requirements are tracked in
 [`RELEASE_CHECKLIST.md`](./RELEASE_CHECKLIST.md). Publishing is performed by the

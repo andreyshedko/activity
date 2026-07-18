@@ -1,8 +1,15 @@
 {
   "name": "@feedclip/activity",
-  "description": "Local-first activity history engine and React UI for business resources.",
+  "description": "Drop-in activity history and audit trail for React applications.",
+  "keywords": [
+    "activity-feed",
+    "audit-log",
+    "history",
+    "react",
+    "timeline"
+  ],
   "license": "MIT",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "type": "module",
   "sideEffects": [
     "./dist/styles.css"

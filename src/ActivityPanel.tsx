@@ -44,6 +44,8 @@ export type ActivityPanelProps = {
   variant?: ActivityPanelVariant;
   theme?: ActivityPanelTheme;
   onEntryClick?: (entry: ActivityRecord) => void;
+  expandedEntryId?: string | null;
+  onExpandedEntryChange?: (entryId: string | null, entry: ActivityRecord) => void;
   onError?: (error: Error) => void;
   onQueryChange?: (query: ActivityPanelQuery) => void;
   messages?: Partial<ActivityPanelMessages>;
@@ -129,6 +131,8 @@ export function ActivityPanel({
   entries: controlledEntries,
   filters,
   onEntryClick,
+  expandedEntryId,
+  onExpandedEntryChange,
   onError,
   onQueryChange,
   search,
@@ -307,9 +311,13 @@ export function ActivityPanel({
               developerMode={developerMode}
               entry={entry}
               entryActions={entryActions}
+              expanded={expandedEntryId === undefined ? undefined : expandedEntryId === entry.id}
               onAttachmentOpen={onAttachmentOpen}
               key={entry.id}
               onEntryClick={onEntryClick}
+              onExpandedChange={(expanded) =>
+                onExpandedEntryChange?.(expanded ? entry.id : null, entry)
+              }
               messages={messages}
               locale={locale}
             />
@@ -324,34 +332,46 @@ function ActivityEntryRow({
   developerMode,
   entry,
   entryActions,
+  expanded: controlledExpanded,
   onAttachmentOpen,
   onEntryClick,
+  onExpandedChange,
   messages,
   locale,
 }: {
   developerMode: boolean;
   entry: ActivityRecord;
   entryActions: readonly ActivityEntryAction[];
+  expanded?: boolean;
   onAttachmentOpen?: (attachment: Readonly<AttachmentContent>, entry: ActivityRecord) => void;
   onEntryClick?: (entry: ActivityRecord) => void;
+  onExpandedChange: (expanded: boolean) => void;
   messages: ActivityPanelMessages;
   locale?: string;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [localExpanded, setLocalExpanded] = useState(false);
+  const expanded = controlledExpanded ?? localExpanded;
   const summary = getEntrySummary(entry, messages);
   const visibleActions = entryActions.filter((action) => action.isVisible?.(entry) ?? true);
   return (
-    <article className="activity-entry">
+    <article className="activity-entry" id={`activity-entry-${entry.id}`}>
       <button
         aria-expanded={expanded}
         className="entry-main"
         onClick={() => {
-          setExpanded((value) => !value);
+          const nextExpanded = !expanded;
+          if (controlledExpanded === undefined) {
+            setLocalExpanded(nextExpanded);
+          }
+          onExpandedChange(nextExpanded);
           onEntryClick?.(entry);
         }}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
-            setExpanded(false);
+            if (controlledExpanded === undefined) {
+              setLocalExpanded(false);
+            }
+            onExpandedChange(false);
             return;
           }
 

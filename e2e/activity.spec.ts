@@ -45,6 +45,18 @@ test("expands an entry and exposes developer details", async ({ page }) => {
   await expect(firstEntry).toHaveAttribute("aria-expanded", "false");
 });
 
+test("opens and clears a deep-linked activity detail", async ({ page }) => {
+  await page.goto("/#activity-entry-evt_1007");
+  const linkedEntry = page.locator("#activity-entry-evt_1007");
+  const toggle = linkedEntry.locator("button.entry-main");
+
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page).toHaveURL(/#activity-entry-evt_1007$/);
+  await toggle.press("Escape");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page).not.toHaveURL(/#activity-entry-/);
+});
+
 test("delegates attachment opening to the host application", async ({ page }) => {
   const attachmentEntry = page.locator(".activity-entry").filter({ hasText: "contract-v3.pdf" });
   await attachmentEntry.hover();

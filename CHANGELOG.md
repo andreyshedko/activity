@@ -3,6 +3,21 @@
 All notable changes to `@feedclip/activity` are documented here. The project
 follows [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-07-18
+
+### Added
+
+- Added controlled activity detail views through `expandedEntryId` and
+  `onExpandedEntryChange` for router-independent deep links.
+- Added stable `activity-entry-{id}` DOM targets for event permalinks.
+- Added a URL-backed deep-link flow to the production demo and Playwright suite.
+
+### Changed
+
+- Clarified Activity's positioning as drop-in activity history and audit-trail
+  infrastructure for React applications.
+- Updated the release documentation for npm Trusted Publisher/OIDC publishing.
+
 ## [0.2.1] - 2026-07-16
 
 ### Added
@@ -46,6 +61,7 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Initial activity engine, React panel, memory adapter, and PostgreSQL adapter.
 
+[0.3.0]: https://github.com/andreyshedko/activity/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/andreyshedko/activity/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/andreyshedko/activity/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/andreyshedko/activity/compare/v0.1.0...v0.1.1
