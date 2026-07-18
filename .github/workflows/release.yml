@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: npm
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
-          cache: npm
+          package-manager-cache: false
       - run: npm ci
       - name: Verify tag matches package version
         env:
@@ -34,7 +34,6 @@ jobs:
       - run: npm audit --audit-level=moderate
       - name: Publish package
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           PACKAGE_SPEC=$(node -p "const p=require('./package.json'); p.name + '@' + p.version")
@@ -43,7 +42,7 @@ jobs:
             exit 0
           fi
           if [[ "$RELEASE_TAG" == *-* ]]; then
-            npm publish --provenance --access public --tag next
+            npm publish --access public --tag next
           else
-            npm publish --provenance --access public
+            npm publish --access public
           fi

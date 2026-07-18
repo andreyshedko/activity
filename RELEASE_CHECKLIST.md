@@ -7,8 +7,8 @@
 - [ ] Run `npm test`, `npm run build`, and `npm audit --audit-level=moderate`.
 - [ ] Run the Next.js smoke build in `examples/nextjs`.
 - [ ] Confirm CI is green on `main` with the PostgreSQL integration test enabled.
-- [ ] Confirm `npm whoami` has publish access to the `@feedclip` scope.
-- [ ] Configure the GitHub `npm` environment and `NPM_TOKEN` secret.
+- [ ] Confirm the `@feedclip/activity` Trusted Publisher targets
+      `andreyshedko/activity`, `release.yml`, and the GitHub `npm` environment.
 - [ ] Inspect `npm pack --dry-run` and verify package entrypoints.
 
 ## Publishing

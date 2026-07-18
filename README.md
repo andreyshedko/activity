@@ -254,13 +254,14 @@ App Router production build.
 
 Release preparation and publishing requirements are tracked in
 [`RELEASE_CHECKLIST.md`](./RELEASE_CHECKLIST.md). Publishing is performed by the
-GitHub Release workflow with npm provenance after the `npm` environment and
-`NPM_TOKEN` secret are configured.
+GitHub Release workflow through the `@feedclip/activity` npm Trusted Publisher.
+The publisher is restricted to `andreyshedko/activity`, `release.yml`, and the
+`npm` GitHub environment; npm generates provenance automatically through OIDC.
 
 ## Status
 
-Version `0.1.1` is an MVP. The public contracts are usable, but the package has not
-yet reached a stable `1.0` compatibility guarantee.
+Activity is still pre-1.0. The public contracts are usable, but the package has
+not yet reached a stable `1.0` compatibility guarantee.
 
 ## License
 
