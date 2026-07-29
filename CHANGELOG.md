@@ -11,6 +11,11 @@ follows [Semantic Versioning](https://semver.org/).
   clean consumer project and verifies its public ESM, CommonJS, memory, and
   PostgreSQL flows.
 
+### Security
+
+- Updated the Next.js example and its PostCSS and Sharp dependencies to patched
+  versions covered by the example's CI audit gate.
+
 ## [0.4.1] - 2026-07-18
 
 ### Changed
