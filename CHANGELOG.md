@@ -3,6 +3,14 @@
 All notable changes to `@feedclip/activity` are documented here. The project
 follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Added a daily registry smoke test that installs the published package in a
+  clean consumer project and verifies its public ESM, CommonJS, memory, and
+  PostgreSQL flows.
+
 ## [0.4.1] - 2026-07-18
 
 ### Changed
