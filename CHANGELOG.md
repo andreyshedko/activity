@@ -10,6 +10,8 @@ follows [Semantic Versioning](https://semver.org/).
 - Added a daily registry smoke test that installs the published package in a
   clean consumer project and verifies its public ESM, CommonJS, memory, and
   PostgreSQL flows.
+- Added five-minute memory, PostgreSQL, and HTTP quick starts that execute in CI
+  against the package's public entrypoints.
 
 ### Security
 

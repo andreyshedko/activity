@@ -40,6 +40,7 @@ jobs:
       - run: npm run build
       - run: npm run api:check
       - run: npm run test:package
+      - run: npm run test:quickstart
       - run: npm run benchmark:postgres
       - run: npm ci --prefix examples/nextjs
       - run: npm run build --prefix examples/nextjs

@@ -28,7 +28,11 @@ Try the package in a clean browser environment with the
 The example installs the public npm release rather than importing SDK source
 files from this repository.
 
-## Quick start
+## Five-minute quick start
+
+Start with memory storage to add the UI without infrastructure. It is ideal for
+prototyping and tests; switch to PostgreSQL before deploying data that must
+survive a process restart.
 
 ```ts
 import {
@@ -68,9 +72,7 @@ const entries = await activity.query({
 });
 ```
 
-## React
-
-The Activity instance is passed explicitly. No provider is required.
+Render the same Activity instance in React:
 
 ```tsx
 import { ActivityPanel } from "@feedclip/activity/react";
@@ -85,6 +87,15 @@ export function InvoiceActivity() {
   );
 }
 ```
+
+That is the complete in-memory integration. See the
+[executable memory example](https://github.com/andreyshedko/activity/blob/main/examples/quickstart/memory.mjs),
+or continue with [PostgreSQL](#postgresql) for persistence and the
+[HTTP adapter](#browser-to-server-http-adapter) when the panel runs in a browser.
+
+## React
+
+The Activity instance is passed explicitly. No provider is required.
 
 Use `messages` to replace UI copy and `locale` to format dates and time:
 
@@ -192,7 +203,9 @@ export const POST = handleActivity;
 
 `authorize` is required and runs before every query or insert. The handler
 revalidates incoming records rather than trusting browser payloads. See the
-[`examples/nextjs`](./examples/nextjs) browser → route handler → PostgreSQL flow.
+[`examples/nextjs`](https://github.com/andreyshedko/activity/tree/main/examples/nextjs)
+browser → route handler → PostgreSQL flow and the smaller
+[executable HTTP example](https://github.com/andreyshedko/activity/blob/main/examples/quickstart/http.mjs).
 
 ### Pagination
 
@@ -293,20 +306,31 @@ query lifecycle:
 
 ## PostgreSQL
 
-Apply the bundled migration, then create an adapter around any client exposing a
-Promise-based `query(sql, params)` method:
+Install a PostgreSQL client in the server application:
+
+```bash
+npm install pg
+```
+
+Apply the bundled `@feedclip/activity/migration.sql` with your migration tool,
+then create an adapter around the pool. Database credentials must remain on the
+server:
 
 ```ts
+import pg from "pg";
 import { createActivity } from "@feedclip/activity";
 import { postgresAdapter } from "@feedclip/activity/adapters/postgres";
 
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const activity = createActivity({
   adapter: postgresAdapter(pool),
 });
 ```
 
 The migration is exported as `@feedclip/activity/migration.sql` and also lives
-at [`migrations/001_activity_schema.sql`](./migrations/001_activity_schema.sql).
+at [`migrations/001_activity_schema.sql`](https://github.com/andreyshedko/activity/blob/main/migrations/001_activity_schema.sql).
+The [executable PostgreSQL quick start](https://github.com/andreyshedko/activity/blob/main/examples/quickstart/postgres.mjs)
+shows migration loading, writing, and paginated reading end to end.
 Review the public [migration guidance](https://github.com/andreyshedko/activity/blob/main/MIGRATIONS.md)
 before applying database changes.
 
