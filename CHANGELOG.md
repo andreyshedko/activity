@@ -3,7 +3,7 @@
 All notable changes to `@feedclip/activity` are documented here. The project
 follows [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.5.0] - 2026-07-30
 
 ### Added
 
@@ -15,6 +15,11 @@ follows [Semantic Versioning](https://semver.org/).
 - Added compatibility gates for package entrypoints, ESM/CommonJS exports,
   TypeScript declarations, released migrations, public errors, and the HTTP wire
   protocol, based on the published `0.4.1` package.
+
+### Changed
+
+- Updated the StackBlitz installation example from `0.3.0` to the current
+  published `0.4.1` package.
 
 ### Security
 
@@ -108,6 +113,7 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Initial activity engine, React panel, memory adapter, and PostgreSQL adapter.
 
+[0.5.0]: https://github.com/andreyshedko/activity/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/andreyshedko/activity/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/andreyshedko/activity/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/andreyshedko/activity/compare/v0.2.1...v0.3.0
