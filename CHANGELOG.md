@@ -12,6 +12,9 @@ follows [Semantic Versioning](https://semver.org/).
   PostgreSQL flows.
 - Added five-minute memory, PostgreSQL, and HTTP quick starts that execute in CI
   against the package's public entrypoints.
+- Added compatibility gates for package entrypoints, ESM/CommonJS exports,
+  TypeScript declarations, released migrations, public errors, and the HTTP wire
+  protocol, based on the published `0.4.1` package.
 
 ### Security
 

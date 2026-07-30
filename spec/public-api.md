@@ -1,7 +1,7 @@
 # Public API
 
-> **Status:** Draft
-> **Version:** 1.0.0
+> **Status:** Reviewed pre-1.0 surface
+> **Compatibility baseline:** `@feedclip/activity@0.4.1`
 > **Depends on:** [`constitution.md`](./constitution.md), [`product.md`](./product.md)
 
 ## 1. Назначение
@@ -25,13 +25,18 @@
 
 ## 3. Публичные пакеты
 
-Version 1.0 экспортирует следующие пакеты:
+Текущая версия экспортирует следующие entrypoints:
 
 | Пакет | Назначение |
 |---|---|
-| `@activity/core` | Core engine и публичный API |
-| `@activity/react` | React UI-компоненты |
-| `@activity/postgres` | PostgreSQL storage adapter |
+| `@feedclip/activity` | Engine, types и memory adapter |
+| `@feedclip/activity/react` | React UI-компонент |
+| `@feedclip/activity/adapters/memory` | Memory adapter |
+| `@feedclip/activity/adapters/postgres` | PostgreSQL adapter |
+| `@feedclip/activity/adapters/http` | Browser HTTP adapter |
+| `@feedclip/activity/http` | Fetch-compatible server handler |
+| `@feedclip/activity/styles.css` | Публичные стили компонента |
+| `@feedclip/activity/migration.sql` | Первая PostgreSQL migration |
 
 Приложения НЕ ДОЛЖНЫ импортировать внутренние пакеты.
 
@@ -40,12 +45,14 @@ Version 1.0 экспортирует следующие пакеты:
 Приложения создают ровно один инстанс `Activity`.
 
 ```ts
-import { createActivity } from "@activity/core";
+import { createActivity } from "@feedclip/activity";
 ```
 
 **Требование:**
 
-- **PUBAPI-001** — SDK ОБЯЗАН предоставлять ровно одну фабричную функцию: `createActivity(...)`. Никакие дополнительные фабричные функции не допускаются в v1 (проверка: unit-тест).
+- **PUBAPI-001** — Root entrypoint предоставляет `ActivityError`,
+  `createActivity(...)` и `createMemoryStorageAdapter(...)`; storage- и
+  framework-specific функции находятся в отдельных entrypoints.
 
 ## 5. `createActivity()`
 
@@ -77,7 +84,8 @@ interface Activity {
 }
 ```
 
-Version 1.0 намеренно предоставляет только две операции.
+Текущий интерфейс намеренно предоставляет три операции, причём `queryPage()`
+остаётся опциональным для совместимости пользовательских реализаций `Activity`.
 
 **Требование:**
 
@@ -163,6 +171,7 @@ const entries = await activity.query({
 resource
 search
 actor
+actorId
 actions
 from
 to

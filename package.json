@@ -76,7 +76,11 @@
     "benchmark:postgres": "npm run build:sdk && node scripts/benchmark-postgres.mjs",
     "api:check": "npm run build:sdk && node scripts/check-public-api.mjs",
     "api:update": "npm run build:sdk && node scripts/check-public-api.mjs --update",
-    "verify": "npm test && npm run test:e2e && npm run build && npm run api:check && npm run test:package && npm run test:quickstart",
+    "compat:check": "npm run build:sdk && node scripts/check-compatibility.mjs",
+    "compat:update": "node scripts/check-compatibility.mjs --update-baseline",
+    "contract:check": "npm run build:sdk && node scripts/check-runtime-contract.mjs",
+    "contract:update": "npm run build:sdk && node scripts/check-runtime-contract.mjs --update",
+    "verify": "npm test && npm run test:e2e && npm run build && npm run api:check && npm run compat:check && npm run contract:check && npm run test:package && npm run test:quickstart",
     "prepack": "npm run clean && npm run typecheck && npm run build:sdk && npm test",
     "stackblitz": "npm install --prefix examples/stackblitz && npm run dev --prefix examples/stackblitz -- --host 0.0.0.0"
   },

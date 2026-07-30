@@ -1,0 +1,94 @@
+{
+  "errors": {
+    "shape": {
+      "name": "ActivityError",
+      "code": "EXAMPLE",
+      "field": "field"
+    },
+    "invalidTrack": {
+      "name": "ActivityError",
+      "code": "INVALID_RESOURCE",
+      "field": "resource.type"
+    },
+    "invalidQuery": {
+      "name": "ActivityError",
+      "code": "INVALID_LIMIT",
+      "field": "limit"
+    }
+  },
+  "http": {
+    "forbidden": {
+      "status": 403,
+      "allow": null,
+      "contentType": "application/json",
+      "body": {
+        "error": "Forbidden"
+      }
+    },
+    "invalidQuery": {
+      "status": 400,
+      "allow": null,
+      "contentType": "application/json",
+      "body": {
+        "error": "resourceType is required"
+      }
+    },
+    "methodNotAllowed": {
+      "status": 405,
+      "allow": "GET, POST",
+      "contentType": "application/json",
+      "body": {
+        "error": "Method not allowed"
+      }
+    },
+    "insert": {
+      "status": 201,
+      "allow": null,
+      "contentType": "application/json",
+      "body": {
+        "ok": true
+      }
+    },
+    "query": {
+      "status": 200,
+      "allow": null,
+      "contentType": "application/json",
+      "body": {
+        "entries": [
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "resource": {
+              "type": "invoice",
+              "id": "invoice"
+            },
+            "action": "create",
+            "actor": {
+              "type": "system",
+              "id": "contract",
+              "name": "Contract"
+            },
+            "timestamp": "2026-07-30T00:00:00.000Z"
+          }
+        ],
+        "total": 1,
+        "hasMore": false
+      }
+    },
+    "authorizedOperations": [
+      {
+        "operation": "insert",
+        "resource": {
+          "type": "invoice",
+          "id": "invoice"
+        }
+      },
+      {
+        "operation": "query",
+        "resource": {
+          "type": "invoice",
+          "id": "invoice"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "packageName": "@feedclip/activity",
+  "packageVersion": "0.4.1",
+  "entrypoints": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    },
+    "./adapters/memory": {
+      "types": "./dist/adapters/memory.d.ts",
+      "import": "./dist/adapters/memory.js",
+      "require": "./dist/adapters/memory.cjs"
+    },
+    "./adapters/postgres": {
+      "types": "./dist/adapters/postgres.d.ts",
+      "import": "./dist/adapters/postgres.js",
+      "require": "./dist/adapters/postgres.cjs"
+    },
+    "./adapters/http": {
+      "types": "./dist/adapters/http.d.ts",
+      "import": "./dist/adapters/http.js",
+      "require": "./dist/adapters/http.cjs"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js",
+      "require": "./dist/http.cjs"
+    },
+    "./styles.css": {
+      "default": "./dist/styles.css"
+    },
+    "./migration.sql": {
+      "default": "./migrations/001_activity_schema.sql"
+    }
+  },
+  "runtimeExports": {
+    ".": {
+      "import": [
+        "ActivityError",
+        "createActivity",
+        "createMemoryStorageAdapter"
+      ],
+      "require": [
+        "ActivityError",
+        "createActivity",
+        "createMemoryStorageAdapter"
+      ]
+    },
+    "./react": {
+      "import": [
+        "ActivityPanel"
+      ],
+      "require": [
+        "ActivityPanel"
+      ]
+    },
+    "./adapters/memory": {
+      "import": [
+        "createMemoryStorageAdapter"
+      ],
+      "require": [
+        "createMemoryStorageAdapter"
+      ]
+    },
+    "./adapters/postgres": {
+      "import": [
+        "postgresAdapter"
+      ],
+      "require": [
+        "postgresAdapter"
+      ]
+    },
+    "./adapters/http": {
+      "import": [
+        "httpAdapter"
+      ],
+      "require": [
+        "httpAdapter"
+      ]
+    },
+    "./http": {
+      "import": [
+        "createActivityHttpHandler"
+      ],
+      "require": [
+        "createActivityHttpHandler"
+      ]
+    }
+  },
+  "declarations": {
+    "dist/ActivityPanel.d.ts": "c06cb8aef12c0d1c4cef6b84968cb3f73ecdce193fd9ed4b451ce02e389a1730",
+    "dist/activity.d.ts": "f4e36370bc367a8c9a9f425ab24958b1364569b377f1e7371154236d98648255",
+    "dist/adapters/http.d.ts": "c99809d6d39d10d9b932307f32aa9fc54f93a0741d667d080f0859c5e554b8d5",
+    "dist/adapters/memory.d.ts": "96277835dde3f472e5ee17bb70936af63997a5dc7f1e32d96bcf6fd0a9bc1426",
+    "dist/adapters/postgres.d.ts": "23078fe108f13dde7e06be528df12fe7adb464dac267f1a8f048de359c20a87b",
+    "dist/http.d.ts": "56b8cf83908f778ea33f327676cb458c281fa837bb6227fb12e25cd2abb473c6",
+    "dist/index.d.ts": "1f9ec967f458d75efd0a048be3b93a1ae3e2258e0ef3f7849529e78847afdd2a",
+    "dist/react.d.ts": "f1a10bf207e4bf3559a4bb283c1b91604720c06a0249d44ae08e3d91fd278bba"
+  },
+  "migrations": {
+    "migrations/001_activity_schema.sql": "08a0ec83dee9aa6223044f6907b21be5c1df2a7cea8aa0fc7c4d77df78b85c4b"
+  },
+  "publicAssets": {
+    "dist/styles.css": "27d2d4e8cb23d040ffb14f55e10401f4b04fd2b27974e5c4086d0a804d6a9745"
+  },
+  "baseline": "@feedclip/activity@0.4.1",
+  "generatedFrom": "npm registry tarball"
+}
