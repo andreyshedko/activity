@@ -3,6 +3,13 @@
 All notable changes to `@feedclip/activity` are documented here. The project
 follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- Updated the StackBlitz installation example to consume the published `0.5.0`
+  package from npm.
+
 ## [0.5.0] - 2026-07-30
 
 ### Added
