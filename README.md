@@ -124,6 +124,36 @@ storage adapter. Each handler receives an immutable `ActivityRecord` and must
 return that record or a new valid record, synchronously or asynchronously. A
 failure stops the pipeline, so the adapter does not persist a partial event.
 
+### Lifecycle events
+
+Attach observers for logging, metrics, or telemetry without coupling them to a
+storage adapter:
+
+```ts
+const activity = createActivity({
+  adapter,
+  listeners: [
+    async (event) => {
+      if (event.type === "afterTrack") {
+        await metrics.increment("activity.tracked", {
+          action: event.record.action,
+        });
+      }
+      if (event.type === "trackFailed") {
+        logger.error(event.error, "Activity tracking failed");
+      }
+    },
+  ],
+});
+```
+
+`beforeTrack` receives the final record after middleware and before persistence.
+`afterTrack` runs after a successful insert. `trackFailed` reports validation,
+middleware, and storage failures and includes a record when one was constructed.
+Events and listener arrays are immutable snapshots. Listener failures are
+isolated: every listener still runs, tracking keeps its original outcome, and a
+persisted record is never rolled back because an observer failed.
+
 ## React
 
 The Activity instance is passed explicitly. No provider is required.
