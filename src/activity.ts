@@ -128,6 +128,15 @@ export type StorageAdapter = {
   query(options: QueryOptions): Promise<QueryResult>;
 };
 
+export type MiddlewareContext = Readonly<{
+  operation: "track";
+}>;
+
+export type ActivityMiddleware = (
+  entry: ActivityRecord,
+  context: MiddlewareContext,
+) => ActivityRecord | Promise<ActivityRecord>;
+
 export type Activity = {
   track(input: TrackInput): Promise<ActivityRecord>;
   query(options: QueryOptions): Promise<ActivityRecord[]>;
@@ -139,6 +148,7 @@ export type ActivityOptions = {
   clock?: () => Date;
   idGenerator?: () => string;
   attachmentPolicy?: AttachmentPolicy;
+  middleware?: readonly ActivityMiddleware[];
 };
 
 export class ActivityError extends Error {
@@ -158,10 +168,21 @@ export function createActivity({
   clock = () => new Date(),
   idGenerator = createId,
   attachmentPolicy,
+  middleware = [],
 }: ActivityOptions): Activity {
+  const pipeline = [...middleware];
+  const middlewareContext: MiddlewareContext = Object.freeze({ operation: "track" });
+
   return {
     async track(input) {
-      const record = createRecord(input, clock, idGenerator, attachmentPolicy);
+      let record = createRecord(input, clock, idGenerator, attachmentPolicy);
+      for (const handler of pipeline) {
+        try {
+          record = validateMiddlewareRecord(await handler(record, middlewareContext));
+        } catch (error) {
+          throw toActivityError(error, "MIDDLEWARE_FAILURE", "Activity middleware failed");
+        }
+      }
       await adapter.insert(record);
       return record;
     },
@@ -175,6 +196,36 @@ export function createActivity({
       return adapter.query(normalized);
     },
   };
+}
+
+function validateMiddlewareRecord(value: unknown): ActivityRecord {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== "string" ||
+    !value.id ||
+    !isRecord(value.resource) ||
+    typeof value.resource.type !== "string" ||
+    !value.resource.type ||
+    typeof value.resource.id !== "string" ||
+    !value.resource.id ||
+    typeof value.action !== "string" ||
+    !value.action ||
+    !isRecord(value.actor) ||
+    typeof value.actor.id !== "string" ||
+    !value.actor.id ||
+    typeof value.actor.name !== "string" ||
+    !value.actor.name ||
+    !["user", "system", "api", "agent"].includes(String(value.actor.type)) ||
+    !(value.timestamp instanceof Date) ||
+    Number.isNaN(value.timestamp.getTime())
+  ) {
+    throw new ActivityError(
+      "INVALID_MIDDLEWARE_RESULT",
+      "middleware must return a valid ActivityRecord",
+    );
+  }
+
+  return freezeRecord(value as ActivityRecord);
 }
 
 export function createMemoryStorageAdapter(

@@ -4,6 +4,7 @@ import {
   ActivityError,
   createActivity,
   createMemoryStorageAdapter as createMemoryStorageAdapterFromRoot,
+  type ActivityMiddleware,
   type Actor,
   type Resource,
 } from "../src";
@@ -71,6 +72,71 @@ test("track returns the normalized ActivityRecord and persists it", async () => 
     await activity.queryPage?.({ resource: invoice, limit: 1, offset: 0 }),
     { entries: [record], total: 1, hasMore: false },
   );
+});
+
+test("middleware runs sequentially with immutable records before persistence", async () => {
+  const inserted: unknown[] = [];
+  const calls: string[] = [];
+  const configuredMiddleware: ActivityMiddleware[] = [
+    async (entry, context) => {
+      calls.push("first");
+      assert.equal(context.operation, "track");
+      assert.equal(Object.isFrozen(context), true);
+      assert.equal(Object.isFrozen(entry), true);
+      await Promise.resolve();
+      return { ...entry, metadata: { ...entry.metadata, requestId: "req_1" } };
+    },
+    (entry) => {
+      calls.push("second");
+      assert.equal(entry.metadata?.requestId, "req_1");
+      return { ...entry, metadata: { ...entry.metadata, source: "middleware" } };
+    },
+  ];
+  const activity = createActivity({
+    adapter: {
+      async insert(entry) { inserted.push(entry); },
+      async query() { return { entries: [], total: 0, hasMore: false }; },
+    },
+    middleware: configuredMiddleware,
+    idGenerator: () => "evt_middleware",
+    clock: () => new Date("2026-07-31T20:00:00.000Z"),
+  });
+  configuredMiddleware.length = 0;
+
+  const record = await activity.track({ resource: invoice, actor, action: "create" });
+
+  assert.deepEqual(calls, ["first", "second"]);
+  assert.equal(record.metadata?.requestId, "req_1");
+  assert.equal(record.metadata?.source, "middleware");
+  assert.equal(Object.isFrozen(record), true);
+  assert.equal(Object.isFrozen(record.metadata), true);
+  assert.deepEqual(inserted, [record]);
+});
+
+test("middleware failures reject tracking without persistence", async () => {
+  let inserts = 0;
+  const adapter = {
+    async insert() { inserts += 1; },
+    async query() { return { entries: [], total: 0, hasMore: false }; },
+  };
+  const input = { resource: invoice, actor, action: "create" } as const;
+
+  await assert.rejects(
+    createActivity({ adapter, middleware: [() => { throw new Error("policy denied"); }] }).track(input),
+    (error: ActivityError) => error.code === "MIDDLEWARE_FAILURE" && error.message === "policy denied",
+  );
+  await assert.rejects(
+    createActivity({
+      adapter,
+      middleware: [() => { throw new ActivityError("TENANT_DENIED", "Tenant denied"); }],
+    }).track(input),
+    (error: ActivityError) => error.code === "TENANT_DENIED",
+  );
+  await assert.rejects(
+    createActivity({ adapter, middleware: [() => undefined as never] }).track(input),
+    (error: ActivityError) => error.code === "INVALID_MIDDLEWARE_RESULT",
+  );
+  assert.equal(inserts, 0);
 });
 
 test("query isolates records by resource type and id", async () => {

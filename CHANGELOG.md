@@ -5,6 +5,11 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added sequential synchronous or asynchronous activity middleware for policy
+  enforcement and metadata enrichment before persistence.
+
 ## [0.6.0] - 2026-07-31
 
 ### Added

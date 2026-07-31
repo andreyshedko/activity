@@ -93,6 +93,37 @@ That is the complete in-memory integration. See the
 or continue with [PostgreSQL](#postgresql) for persistence and the
 [HTTP adapter](#browser-to-server-http-adapter) when the panel runs in a browser.
 
+## Middleware
+
+Use middleware for application policies and server-side enrichment before an
+activity record reaches storage:
+
+```ts
+import { ActivityError, createActivity } from "@feedclip/activity";
+
+const activity = createActivity({
+  adapter,
+  middleware: [
+    (entry) => ({
+      ...entry,
+      metadata: { ...entry.metadata, tenantId: currentTenant.id },
+    }),
+    (entry, context) => {
+      if (!canTrack(entry.resource)) {
+        throw new ActivityError("POLICY_DENIED", "Activity tracking is not allowed");
+      }
+      console.info(context.operation, entry.id);
+      return entry;
+    },
+  ],
+});
+```
+
+Middleware runs sequentially after validation and normalization but before the
+storage adapter. Each handler receives an immutable `ActivityRecord` and must
+return that record or a new valid record, synchronously or asynchronously. A
+failure stops the pipeline, so the adapter does not persist a partial event.
+
 ## React
 
 The Activity instance is passed explicitly. No provider is required.
