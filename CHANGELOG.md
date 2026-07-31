@@ -5,6 +5,13 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added opaque cursor pagination across the memory, PostgreSQL, and HTTP
+  adapters while preserving the existing offset API.
+- Added opt-in `paginationMode="cursor"` support to `ActivityPanel` for stable
+  keyset pagination on frequently changing activity streams.
+
 ## [0.5.1] - 2026-07-31
 
 ### Changed

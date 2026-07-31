@@ -90,6 +90,20 @@ test("HTTP adapter inserts records and supports relative endpoints", async () =>
   assert.deepEqual(result, { entries: [], total: 0, hasMore: false });
 });
 
+test("HTTP adapter and handler preserve opaque cursors", async () => {
+  let requestedUrl = "";
+  const adapter = httpAdapter({
+    endpoint: "/api/activity",
+    fetch: async (input) => {
+      requestedUrl = String(input);
+      return Response.json({ entries: [], total: 3, hasMore: true, nextCursor: "next_page" });
+    },
+  });
+  const page = await adapter.query({ resource: record.resource, cursor: "current_page", limit: 1 });
+  assert.equal(new URL(requestedUrl, "https://example.test").searchParams.get("cursor"), "current_page");
+  assert.equal(page.nextCursor, "next_page");
+});
+
 test("HTTP adapter normalizes transport and response failures", async () => {
   const failures: Array<() => Promise<unknown>> = [
     () => httpAdapter({ endpoint: "/api", fetch: async () => { throw new Error("offline"); } }).query({ resource: record.resource }),

@@ -9,6 +9,7 @@ import {
 } from "../src";
 import { createMemoryStorageAdapter } from "../src/adapters/memory";
 import { ActivityPanel } from "../src/react";
+import { createMemoryStorageAdapter as createMemoryStorageAdapterDirect } from "../src/activity";
 
 const actor: Actor = {
   type: "user",
@@ -30,7 +31,7 @@ const customer: Resource = {
 
 test("track returns the normalized ActivityRecord and persists it", async () => {
   const activity = createActivity({
-    adapter: createMemoryStorageAdapter(),
+    adapter: createMemoryStorageAdapterFromRoot(),
     clock: () => new Date("2026-07-09T09:00:00.000Z"),
     idGenerator: () => "evt_test_1",
   });
@@ -115,6 +116,52 @@ test("query isolates records by resource type and id", async () => {
   assert.equal(invoiceEntries[0].resource.type, "invoice");
   assert.equal(customerEntries.length, 1);
   assert.equal(customerEntries[0].resource.type, "customer");
+});
+
+test("cursor pagination remains stable across equal timestamps", async () => {
+  const activity = createActivity({
+    adapter: createMemoryStorageAdapterDirect(),
+    clock: () => new Date("2026-07-09T09:00:00.000Z"),
+    idGenerator: createSequentialIds("evt_cursor"),
+  });
+  for (let index = 0; index < 3; index += 1) {
+    await activity.track({ resource: invoice, actor, action: "create" });
+  }
+
+  const first = await activity.queryPage!({ resource: invoice, limit: 2 });
+  assert.deepEqual(first.entries.map((entry) => entry.id), ["evt_cursor_3", "evt_cursor_2"]);
+  assert.equal(first.hasMore, true);
+  assert.ok(first.nextCursor);
+
+  const second = await activity.queryPage!({ resource: invoice, limit: 2, cursor: first.nextCursor });
+  assert.deepEqual(second.entries.map((entry) => entry.id), ["evt_cursor_1"]);
+  assert.equal(second.hasMore, false);
+  assert.equal(second.total, 3);
+
+  await assert.rejects(
+    activity.queryPage!({ resource: invoice, cursor: "invalid" }),
+    (error: ActivityError) => error.code === "INVALID_CURSOR" && error.field === "cursor",
+  );
+  await assert.rejects(
+    activity.queryPage!({ resource: invoice, cursor: first.nextCursor, offset: 1 }),
+    (error: ActivityError) => error.code === "INVALID_PAGINATION",
+  );
+  for (const payload of [
+    {},
+    { t: "2026-07-09T09:00:00.000Z", i: "" },
+    { t: "not-a-date", i: "evt" },
+  ]) {
+    const cursor = Buffer.from(JSON.stringify(payload)).toString("base64url");
+    await assert.rejects(activity.queryPage!({ resource: invoice, cursor }), ActivityError);
+  }
+
+  const dated = createMemoryStorageAdapterDirect([
+    { ...(first.entries[0]), id: "newer", timestamp: new Date("2026-07-10T10:00:00Z") },
+    { ...(first.entries[0]), id: "older", timestamp: new Date("2026-07-09T10:00:00Z") },
+  ]);
+  const datedFirst = await dated.query({ resource: invoice, limit: 1 });
+  const datedSecond = await dated.query({ resource: invoice, limit: 1, cursor: datedFirst.nextCursor });
+  assert.equal(datedSecond.entries[0].id, "older");
 });
 
 test("query filters by action and search without domain knowledge", async () => {

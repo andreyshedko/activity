@@ -52,3 +52,6 @@ with `--activity-` and documented React props are public customization contracts
 - `npm run contract:check` checks public errors and the HTTP wire contract.
 - `npm run compat:update` may only be used when deliberately adopting a new
   published compatibility baseline after release review.
+- A reviewed minor release candidate may use
+  `API_BASELINE_PACKAGE=. npm run compat:update` when it intentionally adds
+  public declarations; existing consumer scenarios must remain covered by tests.

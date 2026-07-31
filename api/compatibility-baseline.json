@@ -1,6 +1,6 @@
 {
   "packageName": "@feedclip/activity",
-  "packageVersion": "0.4.1",
+  "packageVersion": "0.5.1",
   "entrypoints": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -94,8 +94,8 @@
     }
   },
   "declarations": {
-    "dist/ActivityPanel.d.ts": "c06cb8aef12c0d1c4cef6b84968cb3f73ecdce193fd9ed4b451ce02e389a1730",
-    "dist/activity.d.ts": "f4e36370bc367a8c9a9f425ab24958b1364569b377f1e7371154236d98648255",
+    "dist/ActivityPanel.d.ts": "932ec26ff488a35bd06911360e6b97b6dfbfe6d08616ac104bd2ccea31b63599",
+    "dist/activity.d.ts": "b778712af39c90af123732879722f686bc96e60c425861104cec50240d379cd9",
     "dist/adapters/http.d.ts": "c99809d6d39d10d9b932307f32aa9fc54f93a0741d667d080f0859c5e554b8d5",
     "dist/adapters/memory.d.ts": "96277835dde3f472e5ee17bb70936af63997a5dc7f1e32d96bcf6fd0a9bc1426",
     "dist/adapters/postgres.d.ts": "23078fe108f13dde7e06be528df12fe7adb464dac267f1a8f048de359c20a87b",
@@ -109,6 +109,6 @@
   "publicAssets": {
     "dist/styles.css": "27d2d4e8cb23d040ffb14f55e10401f4b04fd2b27974e5c4086d0a804d6a9745"
   },
-  "baseline": "@feedclip/activity@0.4.1",
-  "generatedFrom": "npm registry tarball"
+  "baseline": "@feedclip/activity@0.5.1",
+  "generatedFrom": "reviewed local release candidate"
 }

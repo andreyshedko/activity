@@ -220,6 +220,32 @@ const page = await activity.queryPage?.({ resource, limit: 20, offset: 0 });
 `ActivityPanel pageSize={20}` renders an accessible **Load more** action and
 appends subsequent pages without replacing entries already on screen.
 
+For streams that can receive new events while a user is paging, opt into cursor
+pagination so newly inserted rows cannot shift page boundaries:
+
+```tsx
+<ActivityPanel
+  activity={activity}
+  pageSize={20}
+  paginationMode="cursor"
+  resource={{ type: "invoice", id: "inv_123" }}
+/>
+```
+
+The same opaque cursor can be used without React:
+
+```ts
+const first = await activity.queryPage?.({ resource, limit: 20 });
+const second = await activity.queryPage?.({
+  resource,
+  limit: 20,
+  cursor: first?.nextCursor,
+});
+```
+
+`cursor` and `offset` are mutually exclusive. Cursors are transport-safe and
+opaque to consumers; pass `nextCursor` back unchanged.
+
 ### Attachments
 
 Activity records attachment metadata; file upload, malware scanning, access

@@ -93,6 +93,7 @@ function appendQuery(params: URLSearchParams, options: QueryOptions): void {
   if (options.to) params.set("to", options.to.toISOString());
   if (options.limit !== undefined) params.set("limit", String(options.limit));
   if (options.offset !== undefined) params.set("offset", String(options.offset));
+  if (options.cursor) params.set("cursor", options.cursor);
 }
 
 function parseQueryResult(payload: unknown): QueryResult {
@@ -102,7 +103,8 @@ function parseQueryResult(payload: unknown): QueryResult {
   const entries = payload.entries.map(parseRecord);
   const total = typeof payload.total === "number" ? payload.total : entries.length;
   const hasMore = typeof payload.hasMore === "boolean" ? payload.hasMore : false;
-  return { entries, total, hasMore };
+  const nextCursor = typeof payload.nextCursor === "string" ? payload.nextCursor : undefined;
+  return { entries, total, hasMore, ...(nextCursor ? { nextCursor } : {}) };
 }
 
 function parseRecord(value: unknown): ActivityRecord {
