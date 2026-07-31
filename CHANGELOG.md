@@ -5,6 +5,8 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-07-31
+
 ### Changed
 
 - Updated the StackBlitz installation example to consume the published `0.5.0`
@@ -120,6 +122,7 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Initial activity engine, React panel, memory adapter, and PostgreSQL adapter.
 
+[0.5.1]: https://github.com/andreyshedko/activity/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/andreyshedko/activity/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/andreyshedko/activity/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/andreyshedko/activity/compare/v0.3.0...v0.4.0
