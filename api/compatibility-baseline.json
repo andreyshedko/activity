@@ -95,12 +95,12 @@
   },
   "declarations": {
     "dist/ActivityPanel.d.ts": "932ec26ff488a35bd06911360e6b97b6dfbfe6d08616ac104bd2ccea31b63599",
-    "dist/activity.d.ts": "b778712af39c90af123732879722f686bc96e60c425861104cec50240d379cd9",
+    "dist/activity.d.ts": "ce954977c785aed5c84d8e3c980e687cf4295d1032afa01a67a5d7d29d264738",
     "dist/adapters/http.d.ts": "c99809d6d39d10d9b932307f32aa9fc54f93a0741d667d080f0859c5e554b8d5",
     "dist/adapters/memory.d.ts": "96277835dde3f472e5ee17bb70936af63997a5dc7f1e32d96bcf6fd0a9bc1426",
     "dist/adapters/postgres.d.ts": "23078fe108f13dde7e06be528df12fe7adb464dac267f1a8f048de359c20a87b",
     "dist/http.d.ts": "56b8cf83908f778ea33f327676cb458c281fa837bb6227fb12e25cd2abb473c6",
-    "dist/index.d.ts": "1f9ec967f458d75efd0a048be3b93a1ae3e2258e0ef3f7849529e78847afdd2a",
+    "dist/index.d.ts": "b618b455d99f81efa4ba52b62bafc392fbb28dd7776016e1097ee229dbc5ce63",
     "dist/react.d.ts": "f1a10bf207e4bf3559a4bb283c1b91604720c06a0249d44ae08e3d91fd278bba"
   },
   "migrations": {
