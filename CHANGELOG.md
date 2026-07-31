@@ -9,6 +9,8 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Added sequential synchronous or asynchronous activity middleware for policy
   enforcement and metadata enrichment before persistence.
+- Added isolated `beforeTrack`, `afterTrack`, and `trackFailed` lifecycle events
+  for logging, metrics, and telemetry observers.
 
 ## [0.6.0] - 2026-07-31
 

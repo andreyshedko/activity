@@ -4,6 +4,7 @@ import {
   ActivityError,
   createActivity,
   createMemoryStorageAdapter as createMemoryStorageAdapterFromRoot,
+  type ActivityLifecycleEvent,
   type ActivityMiddleware,
   type Actor,
   type Resource,
@@ -137,6 +138,86 @@ test("middleware failures reject tracking without persistence", async () => {
     (error: ActivityError) => error.code === "INVALID_MIDDLEWARE_RESULT",
   );
   assert.equal(inserts, 0);
+});
+
+test("lifecycle listeners observe final records without affecting persistence", async () => {
+  const calls: string[] = [];
+  const configuredListeners = [
+    async (event: ActivityLifecycleEvent) => {
+      calls.push(`first:${event.type}`);
+      assert.equal(Object.isFrozen(event), true);
+      await Promise.resolve();
+      throw new Error("observer failed");
+    },
+    (event: ActivityLifecycleEvent) => {
+      calls.push(`second:${event.type}`);
+      if (event.type !== "trackFailed") {
+        assert.equal(event.record.metadata?.source, "middleware");
+      }
+    },
+  ];
+  const activity = createActivity({
+    adapter: {
+      async insert() { calls.push("insert"); },
+      async query() { return { entries: [], total: 0, hasMore: false }; },
+    },
+    middleware: [(entry) => ({ ...entry, metadata: { source: "middleware" } })],
+    listeners: configuredListeners,
+  });
+  configuredListeners.length = 0;
+
+  const record = await activity.track({ resource: invoice, actor, action: "create" });
+
+  assert.equal(record.metadata?.source, "middleware");
+  assert.deepEqual(calls, [
+    "first:beforeTrack",
+    "second:beforeTrack",
+    "insert",
+    "first:afterTrack",
+    "second:afterTrack",
+  ]);
+});
+
+test("trackFailed reports validation, middleware, and storage failures", async () => {
+  const failures: Extract<ActivityLifecycleEvent, { type: "trackFailed" }>[] = [];
+  const listener = (event: ActivityLifecycleEvent) => {
+    if (event.type === "trackFailed") failures.push(event);
+  };
+  const adapter = {
+    async insert() {},
+    async query() { return { entries: [], total: 0, hasMore: false }; },
+  };
+
+  await assert.rejects(
+    createActivity({ adapter, listeners: [listener] }).track({
+      resource: { type: "", id: "invalid" },
+      actor,
+      action: "create",
+    }),
+    ActivityError,
+  );
+  await assert.rejects(
+    createActivity({
+      adapter,
+      listeners: [listener],
+      middleware: [() => { throw new Error("middleware failed"); }],
+    }).track({ resource: invoice, actor, action: "create" }),
+    ActivityError,
+  );
+  const storageError = new Error("storage failed");
+  await assert.rejects(
+    createActivity({
+      adapter: { ...adapter, async insert() { throw storageError; } },
+      listeners: [listener],
+    }).track({ resource: invoice, actor, action: "create" }),
+    storageError,
+  );
+
+  assert.equal(failures.length, 3);
+  assert.equal(failures[0].record, undefined);
+  assert.equal(failures[1].record?.resource.id, invoice.id);
+  assert.equal(failures[2].record?.resource.id, invoice.id);
+  assert.equal(failures[2].error, storageError);
 });
 
 test("query isolates records by resource type and id", async () => {

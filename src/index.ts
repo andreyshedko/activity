@@ -4,6 +4,8 @@ export {
   createMemoryStorageAdapter,
   type Action,
   type Activity,
+  type ActivityEventListener,
+  type ActivityLifecycleEvent,
   type ActivityMiddleware,
   type ActivityOptions,
   type ActivityRecord,

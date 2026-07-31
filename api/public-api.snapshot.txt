@@ -99,6 +99,18 @@ export type MiddlewareContext = Readonly<{
     operation: "track";
 }>;
 export type ActivityMiddleware = (entry: ActivityRecord, context: MiddlewareContext) => ActivityRecord | Promise<ActivityRecord>;
+export type ActivityLifecycleEvent = Readonly<{
+    type: "beforeTrack";
+    record: ActivityRecord;
+}> | Readonly<{
+    type: "afterTrack";
+    record: ActivityRecord;
+}> | Readonly<{
+    type: "trackFailed";
+    error: unknown;
+    record?: ActivityRecord;
+}>;
+export type ActivityEventListener = (event: ActivityLifecycleEvent) => void | Promise<void>;
 export type Activity = {
     track(input: TrackInput): Promise<ActivityRecord>;
     query(options: QueryOptions): Promise<ActivityRecord[]>;
@@ -110,13 +122,14 @@ export type ActivityOptions = {
     idGenerator?: () => string;
     attachmentPolicy?: AttachmentPolicy;
     middleware?: readonly ActivityMiddleware[];
+    listeners?: readonly ActivityEventListener[];
 };
 export declare class ActivityError extends Error {
     readonly code: string;
     readonly field?: string;
     constructor(code: string, message: string, field?: string);
 }
-export declare function createActivity({ adapter, clock, idGenerator, attachmentPolicy, middleware, }: ActivityOptions): Activity;
+export declare function createActivity({ adapter, clock, idGenerator, attachmentPolicy, middleware, listeners, }: ActivityOptions): Activity;
 export declare function createMemoryStorageAdapter(initialEntries?: ActivityRecord[], latency?: number): StorageAdapter;
 type Queryable = {
     query(sql: string, params?: readonly unknown[]): Promise<{
@@ -242,7 +255,7 @@ export {};
 
 ## dist/index.d.ts
 
-export { ActivityError, createActivity, createMemoryStorageAdapter, type Action, type Activity, type ActivityMiddleware, type ActivityOptions, type ActivityRecord, type Actor, type ActorType, type AttachmentContent, type AttachmentPolicy, type BuiltInAction, type Change, type CommentContent, type Content, type CustomContent, type Metadata, type MiddlewareContext, type QueryOptions, type QueryResult, type Resource, type ResourceReference, type StorageAdapter, type TrackInput, type ValueType, } from "./activity";
+export { ActivityError, createActivity, createMemoryStorageAdapter, type Action, type Activity, type ActivityEventListener, type ActivityLifecycleEvent, type ActivityMiddleware, type ActivityOptions, type ActivityRecord, type Actor, type ActorType, type AttachmentContent, type AttachmentPolicy, type BuiltInAction, type Change, type CommentContent, type Content, type CustomContent, type Metadata, type MiddlewareContext, type QueryOptions, type QueryResult, type Resource, type ResourceReference, type StorageAdapter, type TrackInput, type ValueType, } from "./activity";
 //# sourceMappingURL=index.d.ts.map
 
 ## dist/react.d.ts

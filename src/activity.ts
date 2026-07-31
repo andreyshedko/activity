@@ -137,6 +137,15 @@ export type ActivityMiddleware = (
   context: MiddlewareContext,
 ) => ActivityRecord | Promise<ActivityRecord>;
 
+export type ActivityLifecycleEvent =
+  | Readonly<{ type: "beforeTrack"; record: ActivityRecord }>
+  | Readonly<{ type: "afterTrack"; record: ActivityRecord }>
+  | Readonly<{ type: "trackFailed"; error: unknown; record?: ActivityRecord }>;
+
+export type ActivityEventListener = (
+  event: ActivityLifecycleEvent,
+) => void | Promise<void>;
+
 export type Activity = {
   track(input: TrackInput): Promise<ActivityRecord>;
   query(options: QueryOptions): Promise<ActivityRecord[]>;
@@ -149,6 +158,7 @@ export type ActivityOptions = {
   idGenerator?: () => string;
   attachmentPolicy?: AttachmentPolicy;
   middleware?: readonly ActivityMiddleware[];
+  listeners?: readonly ActivityEventListener[];
 };
 
 export class ActivityError extends Error {
@@ -169,22 +179,35 @@ export function createActivity({
   idGenerator = createId,
   attachmentPolicy,
   middleware = [],
+  listeners = [],
 }: ActivityOptions): Activity {
   const pipeline = [...middleware];
+  const eventListeners = [...listeners];
   const middlewareContext: MiddlewareContext = Object.freeze({ operation: "track" });
 
   return {
     async track(input) {
-      let record = createRecord(input, clock, idGenerator, attachmentPolicy);
-      for (const handler of pipeline) {
-        try {
-          record = validateMiddlewareRecord(await handler(record, middlewareContext));
-        } catch (error) {
-          throw toActivityError(error, "MIDDLEWARE_FAILURE", "Activity middleware failed");
+      let record: ActivityRecord | undefined;
+      try {
+        record = createRecord(input, clock, idGenerator, attachmentPolicy);
+        for (const handler of pipeline) {
+          try {
+            record = validateMiddlewareRecord(await handler(record, middlewareContext));
+          } catch (error) {
+            throw toActivityError(error, "MIDDLEWARE_FAILURE", "Activity middleware failed");
+          }
         }
+        await dispatchEvent(eventListeners, Object.freeze({ type: "beforeTrack", record }));
+        await adapter.insert(record);
+        await dispatchEvent(eventListeners, Object.freeze({ type: "afterTrack", record }));
+        return record;
+      } catch (error) {
+        await dispatchEvent(
+          eventListeners,
+          Object.freeze({ type: "trackFailed", error, ...(record ? { record } : {}) }),
+        );
+        throw error;
       }
-      await adapter.insert(record);
-      return record;
     },
     async query(options) {
       const normalized = normalizeQuery(options);
@@ -196,6 +219,19 @@ export function createActivity({
       return adapter.query(normalized);
     },
   };
+}
+
+async function dispatchEvent(
+  listeners: readonly ActivityEventListener[],
+  event: ActivityLifecycleEvent,
+) {
+  for (const listener of listeners) {
+    try {
+      await listener(event);
+    } catch {
+      // Lifecycle observers cannot alter tracking or persistence outcomes.
+    }
+  }
 }
 
 function validateMiddlewareRecord(value: unknown): ActivityRecord {
