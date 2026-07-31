@@ -22,6 +22,11 @@
       "import": "./dist/adapters/postgres.js",
       "require": "./dist/adapters/postgres.cjs"
     },
+    "./adapters/sqlite": {
+      "types": "./dist/adapters/sqlite.d.ts",
+      "import": "./dist/adapters/sqlite.js",
+      "require": "./dist/adapters/sqlite.cjs"
+    },
     "./adapters/http": {
       "types": "./dist/adapters/http.d.ts",
       "import": "./dist/adapters/http.js",
@@ -37,6 +42,9 @@
     },
     "./migration.sql": {
       "default": "./migrations/001_activity_schema.sql"
+    },
+    "./sqlite-migration.sql": {
+      "default": "./migrations/sqlite/001_activity_schema.sql"
     }
   },
   "runtimeExports": {
@@ -44,12 +52,14 @@
       "import": [
         "ActivityError",
         "createActivity",
-        "createMemoryStorageAdapter"
+        "createMemoryStorageAdapter",
+        "sqliteAdapter"
       ],
       "require": [
         "ActivityError",
         "createActivity",
-        "createMemoryStorageAdapter"
+        "createMemoryStorageAdapter",
+        "sqliteAdapter"
       ]
     },
     "./react": {
@@ -76,6 +86,14 @@
         "postgresAdapter"
       ]
     },
+    "./adapters/sqlite": {
+      "import": [
+        "sqliteAdapter"
+      ],
+      "require": [
+        "sqliteAdapter"
+      ]
+    },
     "./adapters/http": {
       "import": [
         "httpAdapter"
@@ -95,16 +113,18 @@
   },
   "declarations": {
     "dist/ActivityPanel.d.ts": "932ec26ff488a35bd06911360e6b97b6dfbfe6d08616ac104bd2ccea31b63599",
-    "dist/activity.d.ts": "f4594e75e892f9ba0a11ea9125d6feaac9c5a83d89f732df6b5a88d65fd581ce",
+    "dist/activity.d.ts": "36b870238888b9907afd0a5b728329b4054ef0c00fd8d21101071731a2a06225",
     "dist/adapters/http.d.ts": "c99809d6d39d10d9b932307f32aa9fc54f93a0741d667d080f0859c5e554b8d5",
     "dist/adapters/memory.d.ts": "96277835dde3f472e5ee17bb70936af63997a5dc7f1e32d96bcf6fd0a9bc1426",
     "dist/adapters/postgres.d.ts": "23078fe108f13dde7e06be528df12fe7adb464dac267f1a8f048de359c20a87b",
+    "dist/adapters/sqlite.d.ts": "37551bcc2836c69aeb6bf74f79c8566a2a52214bd1db6fefff0b568afe5fede7",
     "dist/http.d.ts": "56b8cf83908f778ea33f327676cb458c281fa837bb6227fb12e25cd2abb473c6",
-    "dist/index.d.ts": "4163b493d93ec1ceee88dcf131c0b285fd59addd11ec41f9524208a2a3b712e8",
+    "dist/index.d.ts": "4ca8b58e20b5f4002bb9cc01679c00ee81334b322037c15a37d81674b50f2b62",
     "dist/react.d.ts": "f1a10bf207e4bf3559a4bb283c1b91604720c06a0249d44ae08e3d91fd278bba"
   },
   "migrations": {
-    "migrations/001_activity_schema.sql": "08a0ec83dee9aa6223044f6907b21be5c1df2a7cea8aa0fc7c4d77df78b85c4b"
+    "migrations/001_activity_schema.sql": "08a0ec83dee9aa6223044f6907b21be5c1df2a7cea8aa0fc7c4d77df78b85c4b",
+    "migrations/sqlite/001_activity_schema.sql": "2a6cd60caeb56e1d04515656c7969518d914505da830a8b6fbf02e66cabcf23a"
   },
   "publicAssets": {
     "dist/styles.css": "27d2d4e8cb23d040ffb14f55e10401f4b04fd2b27974e5c4086d0a804d6a9745"

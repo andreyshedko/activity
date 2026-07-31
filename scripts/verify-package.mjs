@@ -28,10 +28,13 @@ try {
     "dist/react.cjs",
     "dist/adapters/http.js",
     "dist/adapters/http.cjs",
+    "dist/adapters/sqlite.js",
+    "dist/adapters/sqlite.cjs",
     "dist/http.js",
     "dist/http.cjs",
     "dist/styles.css",
     "migrations/001_activity_schema.sql",
+    "migrations/sqlite/001_activity_schema.sql",
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
@@ -66,12 +69,14 @@ try {
     import { ActivityPanel } from "@feedclip/activity/react";
     import { createMemoryStorageAdapter } from "@feedclip/activity/adapters/memory";
     import { httpAdapter } from "@feedclip/activity/adapters/http";
+    import { sqliteAdapter } from "@feedclip/activity/adapters/sqlite";
     import { createActivityHttpHandler } from "@feedclip/activity/http";
     import { createElement } from "react";
     import { renderToStaticMarkup } from "react-dom/server";
     assert.equal(typeof activity.createActivity, "function");
     assert.equal(typeof createMemoryStorageAdapter, "function");
     assert.equal(typeof httpAdapter, "function");
+    assert.equal(typeof sqliteAdapter, "function");
     assert.equal(typeof createActivityHttpHandler, "function");
     const client = activity.createActivity({ adapter: createMemoryStorageAdapter() });
     assert.match(renderToStaticMarkup(createElement(ActivityPanel, {
@@ -92,6 +97,7 @@ try {
     assert.equal(typeof require("@feedclip/activity/react").ActivityPanel, "function");
     assert.equal(typeof require("@feedclip/activity/adapters/postgres").postgresAdapter, "function");
     assert.equal(typeof require("@feedclip/activity/adapters/http").httpAdapter, "function");
+    assert.equal(typeof require("@feedclip/activity/adapters/sqlite").sqliteAdapter, "function");
     assert.equal(typeof require("@feedclip/activity/http").createActivityHttpHandler, "function");
   `);
   run("node", ["verify.cjs"], work);

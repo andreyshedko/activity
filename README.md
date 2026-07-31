@@ -93,6 +93,34 @@ That is the complete in-memory integration. See the
 or continue with [PostgreSQL](#postgresql) for persistence and the
 [HTTP adapter](#browser-to-server-http-adapter) when the panel runs in a browser.
 
+## SQLite
+
+Use SQLite for desktop applications, local-first services, single-node
+deployments, and development environments. The adapter has no runtime driver
+dependency and accepts the synchronous `prepare/run/get/all` contract used by
+Node's built-in SQLite database:
+
+```ts
+import { DatabaseSync } from "node:sqlite";
+import { readFileSync } from "node:fs";
+import { createActivity } from "@feedclip/activity";
+import { sqliteAdapter } from "@feedclip/activity/adapters/sqlite";
+
+const database = new DatabaseSync("activity.db");
+database.exec("pragma foreign_keys = on");
+database.exec(
+  readFileSync(new URL(import.meta.resolve("@feedclip/activity/sqlite-migration.sql")), "utf8"),
+);
+
+const activity = createActivity({ adapter: sqliteAdapter(database) });
+```
+
+The included schema stores timestamps as ISO 8601 text, JSON values as text,
+and identifiers as text. Cursor and offset pagination, filters, search,
+transactions, content, metadata, and changes have the same behavior as the
+PostgreSQL adapter. See the
+[executable SQLite quick start](https://github.com/andreyshedko/activity/blob/main/examples/quickstart/sqlite.mjs).
+
 ## Middleware
 
 Use middleware for application policies and server-side enrichment before an

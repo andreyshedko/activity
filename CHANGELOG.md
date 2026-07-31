@@ -11,6 +11,8 @@ follows [Semantic Versioning](https://semver.org/).
   enforcement and metadata enrichment before persistence.
 - Added isolated `beforeTrack`, `afterTrack`, and `trackFailed` lifecycle events
   for logging, metrics, and telemetry observers.
+- Added a dependency-free SQLite adapter, schema migration, package entrypoint,
+  executable quick start, and real in-memory integration coverage.
 
 ## [0.6.0] - 2026-07-31
 

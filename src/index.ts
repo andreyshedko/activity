@@ -2,6 +2,7 @@ export {
   ActivityError,
   createActivity,
   createMemoryStorageAdapter,
+  sqliteAdapter,
   type Action,
   type Activity,
   type ActivityEventListener,
@@ -25,6 +26,9 @@ export {
   type Resource,
   type ResourceReference,
   type StorageAdapter,
+  type SQLiteDatabase,
+  type SQLiteStatement,
+  type SQLiteValue,
   type TrackInput,
   type ValueType,
 } from "./activity";

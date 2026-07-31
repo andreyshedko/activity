@@ -45,6 +45,11 @@
       "import": "./dist/adapters/postgres.js",
       "require": "./dist/adapters/postgres.cjs"
     },
+    "./adapters/sqlite": {
+      "types": "./dist/adapters/sqlite.d.ts",
+      "import": "./dist/adapters/sqlite.js",
+      "require": "./dist/adapters/sqlite.cjs"
+    },
     "./adapters/http": {
       "types": "./dist/adapters/http.d.ts",
       "import": "./dist/adapters/http.js",
@@ -56,7 +61,8 @@
       "require": "./dist/http.cjs"
     },
     "./styles.css": "./dist/styles.css",
-    "./migration.sql": "./migrations/001_activity_schema.sql"
+    "./migration.sql": "./migrations/001_activity_schema.sql",
+    "./sqlite-migration.sql": "./migrations/sqlite/001_activity_schema.sql"
   },
   "scripts": {
     "dev": "npm run build:demo && python3 -m http.server 5173 --bind 127.0.0.1 --directory demo-dist",

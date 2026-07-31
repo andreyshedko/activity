@@ -142,7 +142,18 @@ type ReleasableQueryable = Queryable & {
 type Connectable = Queryable & {
     connect(): Promise<ReleasableQueryable>;
 };
+export type SQLiteValue = string | number | bigint | Uint8Array | null;
+export type SQLiteStatement = {
+    run(...params: SQLiteValue[]): unknown;
+    get(...params: SQLiteValue[]): unknown;
+    all(...params: SQLiteValue[]): unknown[];
+};
+export type SQLiteDatabase = {
+    exec(sql: string): unknown;
+    prepare(sql: string): SQLiteStatement;
+};
 export declare function postgresAdapter(client: Queryable | Connectable): StorageAdapter;
+export declare function sqliteAdapter(database: SQLiteDatabase): StorageAdapter;
 export {};
 //# sourceMappingURL=activity.d.ts.map
 
@@ -255,7 +266,7 @@ export {};
 
 ## dist/index.d.ts
 
-export { ActivityError, createActivity, createMemoryStorageAdapter, type Action, type Activity, type ActivityEventListener, type ActivityLifecycleEvent, type ActivityMiddleware, type ActivityOptions, type ActivityRecord, type Actor, type ActorType, type AttachmentContent, type AttachmentPolicy, type BuiltInAction, type Change, type CommentContent, type Content, type CustomContent, type Metadata, type MiddlewareContext, type QueryOptions, type QueryResult, type Resource, type ResourceReference, type StorageAdapter, type TrackInput, type ValueType, } from "./activity";
+export { ActivityError, createActivity, createMemoryStorageAdapter, sqliteAdapter, type Action, type Activity, type ActivityEventListener, type ActivityLifecycleEvent, type ActivityMiddleware, type ActivityOptions, type ActivityRecord, type Actor, type ActorType, type AttachmentContent, type AttachmentPolicy, type BuiltInAction, type Change, type CommentContent, type Content, type CustomContent, type Metadata, type MiddlewareContext, type QueryOptions, type QueryResult, type Resource, type ResourceReference, type StorageAdapter, type SQLiteDatabase, type SQLiteStatement, type SQLiteValue, type TrackInput, type ValueType, } from "./activity";
 //# sourceMappingURL=index.d.ts.map
 
 ## dist/react.d.ts
