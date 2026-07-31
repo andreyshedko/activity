@@ -15,19 +15,20 @@ const update = process.argv.includes("--update-baseline");
 if (update) {
   const work = await mkdtemp(join(tmpdir(), "activity-api-baseline-"));
   try {
+    const localBaseline = baselinePackage === ".";
     const packed = JSON.parse(execFileSync("npm", ["pack", baselinePackage, "--json", "--ignore-scripts"], {
-      cwd: work,
+      cwd: localBaseline ? root : work,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "inherit"],
     }));
-    execFileSync("tar", ["-xzf", packed[0].filename], { cwd: work });
+    execFileSync("tar", ["-xzf", join(localBaseline ? root : work, packed[0].filename)], { cwd: work });
     execFileSync("npm", ["install", "--no-save", "--ignore-scripts", "react@19", "react-dom@19"], {
       cwd: join(work, "package"),
       stdio: "inherit",
     });
     const manifest = await collectSurface(join(work, "package"));
-    manifest.baseline = baselinePackage;
-    manifest.generatedFrom = "npm registry tarball";
+    manifest.baseline = localBaseline ? `${manifest.packageName}@${manifest.packageVersion}` : baselinePackage;
+    manifest.generatedFrom = localBaseline ? "reviewed local release candidate" : "npm registry tarball";
     await writeFile(baselinePath, `${JSON.stringify(manifest, null, 2)}\n`);
     console.log(`Updated ${relative(root, baselinePath)} from ${baselinePackage}`);
   } finally {

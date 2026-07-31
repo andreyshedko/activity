@@ -55,6 +55,7 @@ export type ActivityPanelProps = {
   entryActions?: readonly ActivityEntryAction[];
   onAttachmentOpen?: (attachment: Readonly<AttachmentContent>, entry: ActivityRecord) => void;
   pageSize?: number;
+  paginationMode?: "offset" | "cursor";
 };
 
 type ActivityFilters = {
@@ -73,6 +74,7 @@ export type ActivityPanelQuery = {
   to?: Date;
   limit?: number;
   offset?: number;
+  cursor?: string;
 };
 
 type Filter = "all" | "updates" | "content" | "lifecycle";
@@ -150,6 +152,7 @@ export function ActivityPanel({
   entryActions = [],
   onAttachmentOpen,
   pageSize,
+  paginationMode = "offset",
 }: ActivityPanelProps) {
   const messages = { ...defaultMessages, ...messageOverrides };
   const actionLabels: Record<Filter, string> = {
@@ -169,6 +172,7 @@ export function ActivityPanel({
   const [retryToken, setRetryToken] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | undefined>();
   const hasLoaded = useRef(controlledEntries !== undefined);
 
   const query = search ?? localSearch;
@@ -186,6 +190,7 @@ export function ActivityPanel({
       hasLoaded.current = true;
       setStatus("ready");
       setHasMore(false);
+      setNextCursor(undefined);
       return;
     }
 
@@ -209,6 +214,7 @@ export function ActivityPanel({
         if (!cancelled) {
           setEntries(result.entries);
           setHasMore(result.hasMore);
+          setNextCursor(result.nextCursor);
           hasLoaded.current = true;
           setStatus("ready");
         }
@@ -242,6 +248,7 @@ export function ActivityPanel({
     resource,
     retryToken,
     pageSize,
+    paginationMode,
   ]);
 
   const retry = () => setRetryToken((value) => value + 1);
@@ -255,7 +262,7 @@ export function ActivityPanel({
       from: filters?.from,
       to: filters?.to,
       limit: pageSize,
-      offset: entries.length,
+      ...(paginationMode === "cursor" ? { cursor: nextCursor } : { offset: entries.length }),
     };
     setLoadingMore(true);
     onQueryChange?.(queryOptions);
@@ -263,6 +270,7 @@ export function ActivityPanel({
       const result = await queryActivityPage(activity, queryOptions);
       setEntries((current) => [...current, ...result.entries]);
       setHasMore(result.hasMore);
+      setNextCursor(result.nextCursor);
     } catch (unknownError) {
       const nextError =
         unknownError instanceof Error
@@ -382,7 +390,7 @@ export function ActivityPanel({
 async function queryActivityPage(
   activity: Activity,
   options: ActivityPanelQuery,
-): Promise<{ entries: ActivityRecord[]; total: number; hasMore: boolean }> {
+): Promise<{ entries: ActivityRecord[]; total: number; hasMore: boolean; nextCursor?: string }> {
   if (activity.queryPage) return activity.queryPage(options);
   const entries = await activity.query(options);
   return { entries, total: entries.length, hasMore: false };

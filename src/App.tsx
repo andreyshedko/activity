@@ -307,6 +307,7 @@ await activity.track({
             onExpandedEntryChange={selectEntry}
             onQueryChange={setLastQuery}
             pageSize={4}
+            paginationMode="cursor"
             resource={selectedResource.resource}
             theme={theme}
           />

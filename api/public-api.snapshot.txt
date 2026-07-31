@@ -83,11 +83,13 @@ export type QueryOptions = {
     to?: Date;
     limit?: number;
     offset?: number;
+    cursor?: string;
 };
 export type QueryResult = {
     entries: ActivityRecord[];
     total: number;
     hasMore: boolean;
+    nextCursor?: string;
 };
 export type StorageAdapter = {
     insert(entry: ActivityRecord): Promise<void>;
@@ -170,6 +172,7 @@ export type ActivityPanelProps = {
     entryActions?: readonly ActivityEntryAction[];
     onAttachmentOpen?: (attachment: Readonly<AttachmentContent>, entry: ActivityRecord) => void;
     pageSize?: number;
+    paginationMode?: "offset" | "cursor";
 };
 type ActivityFilters = {
     actions?: readonly Action[];
@@ -186,6 +189,7 @@ export type ActivityPanelQuery = {
     to?: Date;
     limit?: number;
     offset?: number;
+    cursor?: string;
 };
 declare const defaultMessages: {
     readonly panelLabel: "Activity history";
@@ -227,7 +231,7 @@ declare const defaultMessages: {
     readonly reason: "Reason";
     readonly createdSuffix: "created";
 };
-export declare function ActivityPanel({ activity, resource, entries: controlledEntries, filters, onEntryClick, expandedEntryId, onExpandedEntryChange, onError, onQueryChange, search, theme, variant, messages: messageOverrides, locale, renderEmpty, renderError, entryActions, onAttachmentOpen, pageSize, }: ActivityPanelProps): React.JSX.Element;
+export declare function ActivityPanel({ activity, resource, entries: controlledEntries, filters, onEntryClick, expandedEntryId, onExpandedEntryChange, onError, onQueryChange, search, theme, variant, messages: messageOverrides, locale, renderEmpty, renderError, entryActions, onAttachmentOpen, pageSize, paginationMode, }: ActivityPanelProps): React.JSX.Element;
 export {};
 //# sourceMappingURL=ActivityPanel.d.ts.map
 

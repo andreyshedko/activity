@@ -82,6 +82,7 @@ function readQuery(url: URL): QueryOptions {
     to: optionalDate(url, "to"),
     limit: optionalNumber(url, "limit"),
     offset: optionalNumber(url, "offset"),
+    cursor: optional(url, "cursor"),
   };
 }
 

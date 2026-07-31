@@ -113,12 +113,14 @@ export type QueryOptions = {
   to?: Date;
   limit?: number;
   offset?: number;
+  cursor?: string;
 };
 
 export type QueryResult = {
   entries: ActivityRecord[];
   total: number;
   hasMore: boolean;
+  nextCursor?: string;
 };
 
 export type StorageAdapter = {
@@ -197,14 +199,18 @@ export function createMemoryStorageAdapter(
         .filter((entry) => matchesDates(entry, normalized.from, normalized.to))
         .filter((entry) => matchesSearch(entry, normalized.search))
         .sort(compareRecords);
-      const offset = normalized.offset as number;
+      const offset = normalized.offset ?? 0;
       const limit = normalized.limit as number;
-      const page = filtered.slice(offset, offset + limit);
+      const cursor = normalized.cursor ? decodeCursor(normalized.cursor) : undefined;
+      const available = cursor ? filtered.filter((entry) => isAfterCursor(entry, cursor)) : filtered;
+      const page = available.slice(offset, offset + limit);
+      const hasMore = offset + page.length < available.length;
 
       return {
         entries: page,
         total: filtered.length,
-        hasMore: offset + page.length < filtered.length,
+        hasMore,
+        ...(hasMore ? { nextCursor: encodeCursor(page[page.length - 1]!) } : {}),
       };
     },
   };
@@ -277,7 +283,7 @@ export function postgresAdapter(client: Queryable | Connectable): StorageAdapter
     async query(options) {
       const normalized = normalizeQuery(options);
       const limit = normalized.limit as number;
-      const offset = normalized.offset as number;
+      const offset = normalized.offset ?? 0;
       const params: unknown[] = [normalized.resource.type, normalized.resource.id];
       const where = ["e.resource_type = $1", "e.resource_id = $2"];
 
@@ -321,12 +327,23 @@ export function postgresAdapter(client: Queryable | Connectable): StorageAdapter
         )`);
       }
 
-      const whereSql = where.join(" and ");
+      const countWhereSql = where.join(" and ");
       const count = await client.query(
-        `select count(*)::int as total from activity_entries e where ${whereSql}`,
+        `select count(*)::int as total from activity_entries e where ${countWhereSql}`,
         params,
       );
-      params.push(limit + 1, offset);
+      if (normalized.cursor) {
+        const cursor = decodeCursor(normalized.cursor);
+        params.push(cursor.timestamp.toISOString(), cursor.id);
+        where.push(`(e.created_at < $${params.length - 1} or (e.created_at = $${params.length - 1} and e.id < $${params.length}::uuid))`);
+      }
+      const whereSql = where.join(" and ");
+      params.push(limit + 1);
+      const limitIndex = params.length;
+      if (!normalized.cursor) params.push(offset);
+      const paginationSql = normalized.cursor
+        ? `limit $${limitIndex}`
+        : `limit $${limitIndex} offset $${params.length}`;
       const rows = await client.query(
         `select
           e.*,
@@ -348,17 +365,19 @@ export function postgresAdapter(client: Queryable | Connectable): StorageAdapter
         where ${whereSql}
         group by e.id
         order by e.created_at desc, e.id desc
-        limit $${params.length - 1} offset $${params.length}`,
+        ${paginationSql}`,
         params,
       );
 
       const total = readTotal(count.rows[0]);
       const entries = rows.rows.slice(0, limit).map(mapPostgresRecord);
 
+      const hasMore = rows.rows.length > limit;
       return {
         entries,
         total,
-        hasMore: rows.rows.length > limit,
+        hasMore,
+        ...(hasMore ? { nextCursor: encodeCursor(entries[entries.length - 1]!) } : {}),
       };
     },
   };
@@ -511,6 +530,12 @@ function normalizeQuery(options: QueryOptions): QueryOptions {
     throw new ActivityError("INVALID_OFFSET", "offset must not be negative", "offset");
   }
 
+  if (options.cursor && options.offset !== undefined) {
+    throw new ActivityError("INVALID_PAGINATION", "cursor and offset cannot be combined", "cursor");
+  }
+
+  if (options.cursor) decodeCursor(options.cursor);
+
   if (options.from && options.to && options.from > options.to) {
     throw new ActivityError("INVALID_DATE_RANGE", "from must be before to", "from");
   }
@@ -533,8 +558,36 @@ function normalizeQuery(options: QueryOptions): QueryOptions {
         )
       : undefined,
     limit: options.limit ?? 50,
-    offset: options.offset ?? 0,
+    offset: options.cursor ? undefined : options.offset ?? 0,
   });
+}
+
+type ActivityCursor = { timestamp: Date; id: string };
+
+function encodeCursor(entry: ActivityRecord): string {
+  const bytes = new TextEncoder().encode(JSON.stringify({ t: entry.timestamp.toISOString(), i: entry.id }));
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function decodeCursor(value: string): ActivityCursor {
+  try {
+    const base64 = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+    const binary = atob(base64);
+    const parsed = JSON.parse(new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)))) as unknown;
+    if (!isRecord(parsed) || typeof parsed.t !== "string" || typeof parsed.i !== "string" || !parsed.i) throw new Error();
+    const timestamp = new Date(parsed.t);
+    if (Number.isNaN(timestamp.getTime())) throw new Error();
+    return { timestamp, id: parsed.i };
+  } catch {
+    throw new ActivityError("INVALID_CURSOR", "cursor is invalid", "cursor");
+  }
+}
+
+function isAfterCursor(entry: ActivityRecord, cursor: ActivityCursor) {
+  return entry.timestamp < cursor.timestamp ||
+    (entry.timestamp.getTime() === cursor.timestamp.getTime() && entry.id.localeCompare(cursor.id) < 0);
 }
 
 function matchesActions(entry: ActivityRecord, actions?: readonly Action[]) {

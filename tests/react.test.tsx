@@ -3,7 +3,7 @@ import { afterEach, test } from "node:test";
 import React from "react";
 import { JSDOM } from "jsdom";
 import axe from "axe-core";
-import { ActivityPanel } from "../src/react";
+import { ActivityPanel, type ActivityPanelQuery } from "../src/react";
 import type { Activity, ActivityRecord } from "../src";
 
 const dom = new JSDOM("<!doctype html><html><body></body></html>", {
@@ -380,6 +380,28 @@ test("loads paginated activity without replacing the current page", async () => 
   assert.deepEqual(offsets, [0, 1]);
   assert.deepEqual(emittedOffsets, [0, 1]);
   assert.equal(screen.queryByRole("button", { name: "More history" }), null);
+});
+
+test("loads subsequent pages with an opaque cursor when requested", async () => {
+  const queries: ActivityPanelQuery[] = [];
+  const activity: Activity = {
+    async track() { throw new Error("not used"); },
+    async query() { throw new Error("queryPage should be preferred"); },
+    async queryPage(options) {
+      queries.push(options);
+      return options.cursor
+        ? { entries: [secondEntry], total: 2, hasMore: false }
+        : { entries: [entry], total: 2, hasMore: true, nextCursor: "cursor_2" };
+    },
+  };
+  render(
+    <ActivityPanel activity={activity} pageSize={1} paginationMode="cursor"
+      resource={{ type: "invoice", id: "inv_1" }} />,
+  );
+  fireEvent.click(await screen.findByRole("button", { name: "Load more" }));
+  assert.ok(await screen.findByText("Ready for payment"));
+  assert.equal(queries[1].cursor, "cursor_2");
+  assert.equal(queries[1].offset, undefined);
 });
 
 test("keeps paginated entries visible when loading another page fails", async () => {

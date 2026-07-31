@@ -209,6 +209,32 @@ test("PostgreSQL query handles defaults, optional fields, totals, and invalid ro
   assert.equal(invalidContent.entries[0].content, undefined);
 });
 
+test("PostgreSQL query uses keyset predicates for cursor pagination", async () => {
+  const cursor = Buffer.from(JSON.stringify({
+    t: "2026-07-11T10:00:00.000Z",
+    i: "11111111-1111-4111-8111-111111111111",
+  })).toString("base64url");
+  const calls: Array<{ sql: string; params?: readonly unknown[] }> = [];
+  const row = {
+    id: "00000000-0000-4000-8000-000000000001",
+    resource_type: "invoice", resource_id: "inv_1", resource_title: null,
+    action: "create", actor_type: "system", actor_id: "sys", actor_name: "System",
+    actor_avatar_url: null, created_at: "2026-07-10T10:00:00Z", changes: [],
+    content_json: null, metadata_json: null,
+  };
+  const result = await postgresAdapter({
+    async query(sql: string, params?: readonly unknown[]) {
+      calls.push({ sql, params });
+      return sql.includes("count(*)") ? { rows: [{ total: 3 }] } : { rows: [row, row] };
+    },
+  }).query({ resource: { type: "invoice", id: "inv_1" }, cursor, limit: 1 });
+
+  assert.match(calls[1].sql, /e\.created_at </);
+  assert.doesNotMatch(calls[1].sql, / offset /);
+  assert.equal(result.hasMore, true);
+  assert.ok(result.nextCursor);
+});
+
 test("createActivity propagates storage failures", async () => {
   const activity = createActivity({
     adapter: {
