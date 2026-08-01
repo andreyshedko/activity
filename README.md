@@ -21,11 +21,27 @@ Use the [documentation hub](docs/README.md) for authentication, tenant isolation
 framework recipes, troubleshooting, customization, performance and onboarding
 feedback.
 
+![Activity demo with the live configurator](docs/assets/activity-configurator.png)
+
+The demo is the real package UI, not a static mock. Use the configurator to try
+themes, density, locale and accent color, then copy the generated JSX and CSS.
+
 ## Install
 
 ```bash
 npm install @feedclip/activity
 ```
+
+Or generate a working integration inside an existing application:
+
+```bash
+npx @feedclip/activity init . --template react-memory
+# production Next.js + PostgreSQL files
+npx @feedclip/activity init . --template next-postgres
+```
+
+The command creates an `ACTIVITY_SETUP.md` checklist and refuses to overwrite
+existing generated files unless `--force` is provided.
 
 React 18 or 19 is required only when using the React entrypoint.
 
@@ -164,6 +180,15 @@ Apply `@feedclip/activity/mysql-migration.sql` with multiple statements enabled
 before tracking data. The adapter supports atomic inserts, search, filters,
 offset pagination, and stable cursor pagination. See the
 [executable MySQL quick start](https://github.com/andreyshedko/activity/blob/main/examples/quickstart/mysql.mjs).
+
+## Headless and reliability entrypoints
+
+Build a custom interface with `@feedclip/activity/headless`: day grouping,
+adjacent-event collapsing, retention filtering, JSON/CSV export and a subscribable
+feed for optimistic or real-time host updates. Add redaction, lifecycle telemetry,
+bounded batch tracking and process-local idempotency from
+`@feedclip/activity/reliability`. See the [headless](docs/headless.md) and
+[reliability](docs/reliability.md) guides.
 
 ## Middleware
 

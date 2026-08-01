@@ -5,7 +5,18 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-01
+
 ### Changed
+
+- Added `npx @feedclip/activity init` with tested React-memory and
+  Next.js-PostgreSQL templates, migrations, API route, panel and setup checklist.
+- Added optional headless grouping, collapsing, retention, export and subscribable
+  feed primitives for custom, optimistic and real-time interfaces.
+- Added redaction, telemetry, bounded batch tracking and process-local idempotency
+  helpers plus a transactional PostgreSQL write benchmark.
+- Added a measured five-integration study kit and evidence-gated commercial
+  packaging guidance.
 
 - Updated the StackBlitz installation example to the published `0.8.0` package.
 - Updated compatibility documentation for MySQL and the published `0.8.0`
@@ -19,6 +30,12 @@ follows [Semantic Versioning](https://semver.org/).
 - Added a documentation hub with authentication and server-framework recipes,
   troubleshooting, customization, performance guidance, product comparisons,
   and structured onboarding feedback.
+- Expanded the 100,000-row PostgreSQL performance contract to cover first-page,
+  cursor, action-filter, and search queries, with a JSON CI artifact.
+- Added a live ActivityPanel configurator for theme, density, locale and accent,
+  with generated copyable JSX and CSS on GitHub Pages.
+- Added a real-demo screenshot, evaluation paths, and a reproducible 60-second
+  product walkthrough for honest product proof and release recording.
 
 ## [0.8.0] - 2026-08-01
 

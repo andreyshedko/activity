@@ -10,6 +10,8 @@ const entryPoints = {
   "adapters/mysql": "src/adapters/mysql.ts",
   "adapters/http": "src/adapters/http.ts",
   http: "src/http.ts",
+  headless: "src/headless.ts",
+  reliability: "src/reliability.ts",
 };
 
 await rm("dist", { force: true, recursive: true });

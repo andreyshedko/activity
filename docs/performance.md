@@ -7,9 +7,17 @@ budgets:
 1. the database must find a resource page efficiently inside a large table;
 2. the panel must render and interact with the configured page size.
 
-CI creates 100 000 PostgreSQL entries, analyzes the table, warms the query, then
-measures 20 resource-page samples. The default contract is p95 below 100 ms on a
-GitHub Actions PostgreSQL service:
+CI creates 100 000 PostgreSQL entries, analyzes the table, warms every scenario,
+then measures 20 samples for each of:
+
+- the first resource page;
+- a cursor page;
+- an action-filtered page;
+- resource-scoped full-text search.
+- single-record transactional writes.
+
+The default contract is p95 below 100 ms per scenario on a GitHub Actions
+PostgreSQL service:
 
 ```bash
 DATABASE_URL=postgresql://... npm run benchmark:postgres
@@ -31,3 +39,7 @@ page rendered by `ActivityPanel`.
 Before production, benchmark with your real distribution of tenant/resource IDs,
 search terms, changes and content. Shared CI results are regression guards, not a
 latency guarantee for a specific cloud database.
+
+Every verify job uploads `postgres-performance-report` as a JSON artifact with
+dataset size, threshold, median and p95 for each scenario. This makes performance
+changes reviewable instead of relying on an undocumented local run.
