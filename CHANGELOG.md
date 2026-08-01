@@ -19,6 +19,8 @@ follows [Semantic Versioning](https://semver.org/).
 - Added a documentation hub with authentication and server-framework recipes,
   troubleshooting, customization, performance guidance, product comparisons,
   and structured onboarding feedback.
+- Expanded the 100,000-row PostgreSQL performance contract to cover first-page,
+  cursor, action-filter, and search queries, with a JSON CI artifact.
 
 ## [0.8.0] - 2026-08-01
 

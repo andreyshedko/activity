@@ -36,29 +36,49 @@ try {
   await pool.query("analyze activity_entries");
 
   const adapter = postgresAdapter(pool);
-  const query = { resource: { type: "invoice", id: "inv_42" }, limit: 50 };
-  for (let index = 0; index < 5; index += 1) await adapter.query(query);
+  const resource = { type: "invoice", id: "inv_42" };
+  const firstPage = await adapter.query({ resource, limit: 50 });
+  if (!firstPage.nextCursor) throw new Error("Benchmark dataset did not produce a cursor");
+  const scenarios = [
+    { name: "resource-page", query: { resource, limit: 50 }, expected: 50 },
+    { name: "cursor-page", query: { resource, limit: 25, cursor: firstPage.nextCursor }, expected: 25 },
+    { name: "action-filter", query: { resource, limit: 25, actions: ["update"] }, expected: 25 },
+    { name: "resource-search", query: { resource, limit: 50, search: "Invoice 42" }, expected: 50 },
+  ];
+  const results = [];
+  for (const scenario of scenarios) results.push(await measure(adapter, scenario, thresholdMs));
+  const report = {
+    datasetSize,
+    generatedAt: new Date().toISOString(),
+    samplesPerScenario: 20,
+    thresholdMs,
+    scenarios: results,
+  };
+  console.log(JSON.stringify(report, null, 2));
+} finally {
+  await pool.end();
+}
 
+async function measure(adapter, scenario, threshold) {
+  for (let index = 0; index < 5; index += 1) await adapter.query(scenario.query);
   const samples = [];
   for (let index = 0; index < 20; index += 1) {
     const start = performance.now();
-    const result = await adapter.query(query);
+    const result = await adapter.query(scenario.query);
     samples.push(performance.now() - start);
-    if (result.entries.length !== 50) throw new Error("Benchmark query returned an unexpected page");
+    if (result.entries.length !== scenario.expected) {
+      throw new Error(`${scenario.name} returned ${result.entries.length}, expected ${scenario.expected}`);
+    }
   }
   samples.sort((a, b) => a - b);
+  const median = samples[Math.floor(samples.length / 2)];
   const p95 = samples[Math.ceil(samples.length * 0.95) - 1];
-  const report = {
-    datasetSize,
-    samples: samples.length,
-    medianMs: Number(samples[Math.floor(samples.length / 2)].toFixed(2)),
-    p95Ms: Number(p95.toFixed(2)),
-    thresholdMs,
-  };
-  console.log(JSON.stringify(report, null, 2));
-  if (p95 > thresholdMs) {
-    throw new Error(`PostgreSQL timeline p95 ${p95.toFixed(2)}ms exceeds ${thresholdMs}ms`);
+  if (p95 > threshold) {
+    throw new Error(`${scenario.name} p95 ${p95.toFixed(2)}ms exceeds ${threshold}ms`);
   }
-} finally {
-  await pool.end();
+  return {
+    name: scenario.name,
+    medianMs: Number(median.toFixed(2)),
+    p95Ms: Number(p95.toFixed(2)),
+  };
 }
