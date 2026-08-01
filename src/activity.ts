@@ -310,6 +310,19 @@ type Queryable = {
 type ReleasableQueryable = Queryable & { release(): void };
 type Connectable = Queryable & { connect(): Promise<ReleasableQueryable> };
 
+export type SQLiteValue = string | number | bigint | Uint8Array | null;
+
+export type SQLiteStatement = {
+  run(...params: SQLiteValue[]): unknown;
+  get(...params: SQLiteValue[]): unknown;
+  all(...params: SQLiteValue[]): unknown[];
+};
+
+export type SQLiteDatabase = {
+  exec(sql: string): unknown;
+  prepare(sql: string): SQLiteStatement;
+};
+
 export function postgresAdapter(client: Queryable | Connectable): StorageAdapter {
   return {
     async insert(entry) {
@@ -460,6 +473,129 @@ export function postgresAdapter(client: Queryable | Connectable): StorageAdapter
       const entries = rows.rows.slice(0, limit).map(mapPostgresRecord);
 
       const hasMore = rows.rows.length > limit;
+      return {
+        entries,
+        total,
+        hasMore,
+        ...(hasMore ? { nextCursor: encodeCursor(entries[entries.length - 1]!) } : {}),
+      };
+    },
+  };
+}
+
+export function sqliteAdapter(database: SQLiteDatabase): StorageAdapter {
+  return {
+    async insert(entry) {
+      database.exec("BEGIN");
+      try {
+        database.prepare(`insert into activity_entries (
+          id, resource_type, resource_id, resource_title, action,
+          actor_type, actor_id, actor_name, actor_avatar_url,
+          content_type, content_json, metadata_json, created_at
+        ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+          .run(
+            entry.id,
+            entry.resource.type,
+            entry.resource.id,
+            entry.resource.title ?? null,
+            entry.action,
+            entry.actor.type,
+            entry.actor.id,
+            entry.actor.name,
+            entry.actor.avatarUrl ?? null,
+            entry.content?.type ?? null,
+            entry.content ? JSON.stringify(entry.content) : null,
+            entry.metadata ? JSON.stringify(entry.metadata) : null,
+            entry.timestamp.toISOString(),
+          );
+
+        const insertChange = database.prepare(`insert into activity_changes (
+          id, entry_id, position, field, label, before_value, after_value, value_type
+        ) values (?, ?, ?, ?, ?, ?, ?, ?)`);
+        for (const [position, change] of (entry.changes ?? []).entries()) {
+          insertChange.run(
+            createId(),
+            entry.id,
+            position,
+            change.field,
+            change.label,
+            JSON.stringify(change.before ?? null),
+            JSON.stringify(change.after ?? null),
+            change.valueType,
+          );
+        }
+        database.exec("COMMIT");
+      } catch (error) {
+        database.exec("ROLLBACK");
+        throw toActivityError(error, "STORAGE_FAILURE", "Could not insert activity record");
+      }
+    },
+    async query(options) {
+      const normalized = normalizeQuery(options);
+      const params: SQLiteValue[] = [normalized.resource.type, normalized.resource.id];
+      const where = ["resource_type = ?", "resource_id = ?"];
+
+      if (normalized.actions?.length) {
+        where.push(`action in (${normalized.actions.map(() => "?").join(", ")})`);
+        params.push(...normalized.actions);
+      }
+      const actorId = normalized.actorId ?? normalized.actor;
+      if (actorId) {
+        where.push("actor_id = ?");
+        params.push(actorId);
+      }
+      if (normalized.from) {
+        where.push("created_at >= ?");
+        params.push(normalized.from.toISOString());
+      }
+      if (normalized.to) {
+        where.push("created_at <= ?");
+        params.push(normalized.to.toISOString());
+      }
+      if (normalized.search) {
+        where.push(`(
+          actor_name like ? collate nocase
+          or resource_title like ? collate nocase
+          or content_json like ? collate nocase
+          or exists (
+            select 1 from activity_changes c
+            where c.entry_id = activity_entries.id
+              and (
+                c.label like ? collate nocase
+                or c.before_value like ? collate nocase
+                or c.after_value like ? collate nocase
+              )
+          )
+        )`);
+        const search = `%${normalized.search}%`;
+        params.push(search, search, search, search, search, search);
+      }
+
+      const countWhere = where.join(" and ");
+      const total = readTotal(database.prepare(
+        `select count(*) as total from activity_entries where ${countWhere}`,
+      ).get(...params));
+      if (normalized.cursor) {
+        const cursor = decodeCursor(normalized.cursor);
+        where.push("(created_at < ? or (created_at = ? and id < ?))");
+        const timestamp = cursor.timestamp.toISOString();
+        params.push(timestamp, timestamp, cursor.id);
+      }
+
+      const limit = normalized.limit as number;
+      params.push(limit + 1);
+      let pagination = "limit ?";
+      if (!normalized.cursor) {
+        pagination += " offset ?";
+        params.push(normalized.offset as number);
+      }
+      const rows = database.prepare(`select * from activity_entries
+        where ${where.join(" and ")}
+        order by created_at desc, id desc
+        ${pagination}`).all(...params);
+      const entries = rows.slice(0, limit).map((row) => mapSQLiteRecord(database, row));
+      const hasMore = rows.length > limit;
+
       return {
         entries,
         total,
@@ -819,6 +955,56 @@ function mapPostgresChange(change: unknown): Change {
     after: change.after,
     valueType: String(change.valueType) as ValueType,
   };
+}
+
+function mapSQLiteRecord(database: SQLiteDatabase, row: unknown): ActivityRecord {
+  if (!isRecord(row)) {
+    throw new ActivityError("STORAGE_FAILURE", "Invalid activity row returned by storage");
+  }
+  const changes = database.prepare(`select
+    field, label, before_value, after_value, value_type
+    from activity_changes where entry_id = ? order by position`).all(String(row.id)).map((change) => {
+      if (!isRecord(change)) {
+        throw new ActivityError("STORAGE_FAILURE", "Invalid activity change returned by storage");
+      }
+      return {
+        field: String(change.field),
+        label: String(change.label),
+        before: parseSQLiteJson(change.before_value),
+        after: parseSQLiteJson(change.after_value),
+        valueType: String(change.value_type) as ValueType,
+      };
+    });
+
+  return freezeRecord({
+    id: String(row.id),
+    resource: {
+      type: String(row.resource_type),
+      id: String(row.resource_id),
+      title: typeof row.resource_title === "string" ? row.resource_title : undefined,
+    },
+    action: String(row.action) as Action,
+    actor: {
+      type: String(row.actor_type) as ActorType,
+      id: String(row.actor_id),
+      name: String(row.actor_name),
+      avatarUrl: typeof row.actor_avatar_url === "string" ? row.actor_avatar_url : undefined,
+    },
+    timestamp: new Date(String(row.created_at)),
+    changes: changes.length ? changes : undefined,
+    content: parseSQLiteJson(row.content_json) as Content | undefined,
+    metadata: parseSQLiteJson(row.metadata_json) as Metadata | undefined,
+  });
+}
+
+function parseSQLiteJson(value: unknown): unknown {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new ActivityError("STORAGE_FAILURE", "Invalid JSON returned by SQLite storage");
+  }
 }
 
 function isContent(value: unknown): value is Content {

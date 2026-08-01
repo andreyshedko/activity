@@ -21,3 +21,7 @@ production data and test against a staging copy before changing package versions
 
 Destructive schema changes require an RFC, a migration guide, and a major version.
 The SDK never runs migrations automatically.
+
+SQLite uses a separate migration history under `migrations/sqlite` and exposes
+its initial schema as `@feedclip/activity/sqlite-migration.sql`. Do not include
+that directory in a PostgreSQL migration runner.
