@@ -21,6 +21,8 @@ follows [Semantic Versioning](https://semver.org/).
   and structured onboarding feedback.
 - Expanded the 100,000-row PostgreSQL performance contract to cover first-page,
   cursor, action-filter, and search queries, with a JSON CI artifact.
+- Added a live ActivityPanel configurator for theme, density, locale and accent,
+  with generated copyable JSX and CSS on GitHub Pages.
 
 ## [0.8.0] - 2026-08-01
 
