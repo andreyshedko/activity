@@ -7,6 +7,7 @@ const entryPoints = {
   "adapters/memory": "src/adapters/memory.ts",
   "adapters/postgres": "src/adapters/postgres.ts",
   "adapters/sqlite": "src/adapters/sqlite.ts",
+  "adapters/mysql": "src/adapters/mysql.ts",
   "adapters/http": "src/adapters/http.ts",
   http: "src/http.ts",
 };

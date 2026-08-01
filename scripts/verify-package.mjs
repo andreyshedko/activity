@@ -30,11 +30,14 @@ try {
     "dist/adapters/http.cjs",
     "dist/adapters/sqlite.js",
     "dist/adapters/sqlite.cjs",
+    "dist/adapters/mysql.js",
+    "dist/adapters/mysql.cjs",
     "dist/http.js",
     "dist/http.cjs",
     "dist/styles.css",
     "migrations/001_activity_schema.sql",
     "migrations/sqlite/001_activity_schema.sql",
+    "migrations/mysql/001_activity_schema.sql",
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
@@ -52,7 +55,7 @@ try {
     assert(!names.includes(file), `Package contains internal documentation: ${file}`);
   }
   assert(artifact.size <= 250_000, `Tarball is too large: ${artifact.size} bytes`);
-  assert(artifact.unpackedSize <= 1_000_000, `Unpacked package is too large: ${artifact.unpackedSize} bytes`);
+  assert(artifact.unpackedSize <= 1_250_000, `Unpacked package is too large: ${artifact.unpackedSize} bytes`);
   assert(!names.some((name) => name.startsWith("src/") || name.startsWith("tests/") || name === ".env"), "Package contains development or environment files");
 
   const secretPattern = /(npm_[A-Za-z0-9]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|postgres(?:ql)?:\/\/[^\s:@]+:[^\s@]+@)/;
@@ -70,6 +73,7 @@ try {
     import { createMemoryStorageAdapter } from "@feedclip/activity/adapters/memory";
     import { httpAdapter } from "@feedclip/activity/adapters/http";
     import { sqliteAdapter } from "@feedclip/activity/adapters/sqlite";
+    import { mysqlAdapter } from "@feedclip/activity/adapters/mysql";
     import { createActivityHttpHandler } from "@feedclip/activity/http";
     import { createElement } from "react";
     import { renderToStaticMarkup } from "react-dom/server";
@@ -77,6 +81,7 @@ try {
     assert.equal(typeof createMemoryStorageAdapter, "function");
     assert.equal(typeof httpAdapter, "function");
     assert.equal(typeof sqliteAdapter, "function");
+    assert.equal(typeof mysqlAdapter, "function");
     assert.equal(typeof createActivityHttpHandler, "function");
     const client = activity.createActivity({ adapter: createMemoryStorageAdapter() });
     assert.match(renderToStaticMarkup(createElement(ActivityPanel, {
@@ -98,6 +103,7 @@ try {
     assert.equal(typeof require("@feedclip/activity/adapters/postgres").postgresAdapter, "function");
     assert.equal(typeof require("@feedclip/activity/adapters/http").httpAdapter, "function");
     assert.equal(typeof require("@feedclip/activity/adapters/sqlite").sqliteAdapter, "function");
+    assert.equal(typeof require("@feedclip/activity/adapters/mysql").mysqlAdapter, "function");
     assert.equal(typeof require("@feedclip/activity/http").createActivityHttpHandler, "function");
   `);
   run("node", ["verify.cjs"], work);

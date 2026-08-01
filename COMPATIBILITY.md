@@ -19,6 +19,6 @@ expand before 1.0.
 The package does not require a CSS framework. Browser consumers must support CSS
 custom properties, `Intl.DateTimeFormat`, and standard ES2020 output.
 
-PostgreSQL migrations remain in the root `migrations` directory. SQLite has an
-independent dialect-specific history under `migrations/sqlite`; never apply one
-database dialect's migration files to the other.
+PostgreSQL migrations remain in the root `migrations` directory. SQLite and
+MySQL have independent dialect-specific histories under `migrations/sqlite` and
+`migrations/mysql`; never apply one database dialect's migration files to another.

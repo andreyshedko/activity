@@ -5,6 +5,11 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added a dependency-free MySQL adapter, dialect-specific migration, executable
+  quick start, and MySQL 8.0/8.4 integration coverage.
+
 ## [0.7.0] - 2026-08-01
 
 ### Added

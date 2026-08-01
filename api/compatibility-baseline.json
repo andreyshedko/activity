@@ -27,6 +27,11 @@
       "import": "./dist/adapters/sqlite.js",
       "require": "./dist/adapters/sqlite.cjs"
     },
+    "./adapters/mysql": {
+      "types": "./dist/adapters/mysql.d.ts",
+      "import": "./dist/adapters/mysql.js",
+      "require": "./dist/adapters/mysql.cjs"
+    },
     "./adapters/http": {
       "types": "./dist/adapters/http.d.ts",
       "import": "./dist/adapters/http.js",
@@ -45,6 +50,9 @@
     },
     "./sqlite-migration.sql": {
       "default": "./migrations/sqlite/001_activity_schema.sql"
+    },
+    "./mysql-migration.sql": {
+      "default": "./migrations/mysql/001_activity_schema.sql"
     }
   },
   "runtimeExports": {
@@ -94,6 +102,14 @@
         "sqliteAdapter"
       ]
     },
+    "./adapters/mysql": {
+      "import": [
+        "mysqlAdapter"
+      ],
+      "require": [
+        "mysqlAdapter"
+      ]
+    },
     "./adapters/http": {
       "import": [
         "httpAdapter"
@@ -113,9 +129,10 @@
   },
   "declarations": {
     "dist/ActivityPanel.d.ts": "932ec26ff488a35bd06911360e6b97b6dfbfe6d08616ac104bd2ccea31b63599",
-    "dist/activity.d.ts": "36b870238888b9907afd0a5b728329b4054ef0c00fd8d21101071731a2a06225",
+    "dist/activity.d.ts": "1b4750608ab1127bd7813490429470550c5eaef39f9a36d468674c38f7740801",
     "dist/adapters/http.d.ts": "c99809d6d39d10d9b932307f32aa9fc54f93a0741d667d080f0859c5e554b8d5",
     "dist/adapters/memory.d.ts": "96277835dde3f472e5ee17bb70936af63997a5dc7f1e32d96bcf6fd0a9bc1426",
+    "dist/adapters/mysql.d.ts": "e9ca076f43c04317e3c641ac4913349ba1de980e6849a17b735d7aa37e339d29",
     "dist/adapters/postgres.d.ts": "23078fe108f13dde7e06be528df12fe7adb464dac267f1a8f048de359c20a87b",
     "dist/adapters/sqlite.d.ts": "37551bcc2836c69aeb6bf74f79c8566a2a52214bd1db6fefff0b568afe5fede7",
     "dist/http.d.ts": "56b8cf83908f778ea33f327676cb458c281fa837bb6227fb12e25cd2abb473c6",
@@ -124,6 +141,7 @@
   },
   "migrations": {
     "migrations/001_activity_schema.sql": "08a0ec83dee9aa6223044f6907b21be5c1df2a7cea8aa0fc7c4d77df78b85c4b",
+    "migrations/mysql/001_activity_schema.sql": "54a24589c3ca8e8bfb5f84d5293ecfb1852d470e7069271008d90b19e8cfb1a7",
     "migrations/sqlite/001_activity_schema.sql": "2a6cd60caeb56e1d04515656c7969518d914505da830a8b6fbf02e66cabcf23a"
   },
   "publicAssets": {

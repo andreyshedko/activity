@@ -152,8 +152,22 @@ export type SQLiteDatabase = {
     exec(sql: string): unknown;
     prepare(sql: string): SQLiteStatement;
 };
+export type MySQLQueryResult = readonly [unknown, unknown];
+export type MySQLValue = string | number | bigint | boolean | Date | Uint8Array | null;
+export type MySQLConnection = {
+    execute(sql: string, params?: MySQLValue[]): Promise<MySQLQueryResult>;
+    beginTransaction(): Promise<void>;
+    commit(): Promise<void>;
+    rollback(): Promise<void>;
+    release?(): void;
+};
+export type MySQLClient = MySQLConnection | {
+    execute(sql: string, params?: MySQLValue[]): Promise<MySQLQueryResult>;
+    getConnection(): Promise<MySQLConnection>;
+};
 export declare function postgresAdapter(client: Queryable | Connectable): StorageAdapter;
 export declare function sqliteAdapter(database: SQLiteDatabase): StorageAdapter;
+export declare function mysqlAdapter(client: MySQLClient): StorageAdapter;
 export {};
 //# sourceMappingURL=activity.d.ts.map
 
@@ -283,6 +297,11 @@ export { createMemoryStorageAdapter } from "../activity";
 
 export { postgresAdapter } from "../activity";
 //# sourceMappingURL=postgres.d.ts.map
+
+## dist/adapters/mysql.d.ts
+
+export { mysqlAdapter, type MySQLClient, type MySQLConnection, type MySQLQueryResult, type MySQLValue, } from "../activity";
+//# sourceMappingURL=mysql.d.ts.map
 
 ## dist/adapters/http.d.ts
 

@@ -32,10 +32,14 @@ try {
     "dist/react.js",
     "dist/adapters/memory.js",
     "dist/adapters/postgres.js",
+    "dist/adapters/sqlite.js",
+    "dist/adapters/mysql.js",
     "dist/adapters/http.js",
     "dist/http.js",
     "dist/styles.css",
     "migrations/001_activity_schema.sql",
+    "migrations/sqlite/001_activity_schema.sql",
+    "migrations/mysql/001_activity_schema.sql",
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
@@ -62,6 +66,8 @@ try {
     import { createActivity } from "@feedclip/activity";
     import { createMemoryStorageAdapter } from "@feedclip/activity/adapters/memory";
     import { postgresAdapter } from "@feedclip/activity/adapters/postgres";
+    import { sqliteAdapter } from "@feedclip/activity/adapters/sqlite";
+    import { mysqlAdapter } from "@feedclip/activity/adapters/mysql";
     import pg from "pg";
 
     const expectedVersion = process.env.EXPECTED_VERSION;
@@ -74,6 +80,8 @@ try {
     const require = createRequire(import.meta.url);
     assert.equal(typeof require("@feedclip/activity").createActivity, "function");
     assert.equal(typeof require("@feedclip/activity/adapters/postgres").postgresAdapter, "function");
+    assert.equal(typeof sqliteAdapter, "function");
+    assert.equal(typeof mysqlAdapter, "function");
 
     let memoryId = 0;
     const memory = createActivity({

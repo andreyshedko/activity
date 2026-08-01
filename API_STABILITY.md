@@ -8,10 +8,14 @@ The reviewed public surface is the declarations exported by:
 - `@feedclip/activity/react`
 - `@feedclip/activity/adapters/memory`
 - `@feedclip/activity/adapters/postgres`
+- `@feedclip/activity/adapters/sqlite`
+- `@feedclip/activity/adapters/mysql`
 - `@feedclip/activity/adapters/http`
 - `@feedclip/activity/http`
 - `@feedclip/activity/styles.css`
 - `@feedclip/activity/migration.sql`
+- `@feedclip/activity/sqlite-migration.sql`
+- `@feedclip/activity/mysql-migration.sql`
 
 CI compares declarations with `api/public-api.snapshot.txt`, runtime error and
 HTTP behavior with `api/runtime-contract.snapshot.json`, and the complete package
