@@ -1,7 +1,7 @@
 # Activity
 
 [![npm](https://img.shields.io/npm/v/@feedclip/activity)](https://www.npmjs.com/package/@feedclip/activity)
-[![provenance](https://img.shields.io/badge/npm-provenance-verified-blue)](https://www.npmjs.com/package/@feedclip/activity)
+[![provenance](https://img.shields.io/badge/provenance-verified-blue)](https://www.npmjs.com/package/@feedclip/activity)
 [![license](https://img.shields.io/npm/l/@feedclip/activity)](https://github.com/andreyshedko/activity/blob/main/LICENSE)
 
 [Live demo](https://andreyshedko.github.io/activity/) ·
