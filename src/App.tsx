@@ -130,6 +130,14 @@ export function App() {
         </div>
         <a
           className="starter-link"
+          href="https://github.com/andreyshedko/activity/tree/main/docs"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Documentation
+        </a>
+        <a
+          className="starter-link"
           href="https://github.com/andreyshedko/activity/tree/main/examples/nextjs"
           rel="noreferrer"
           target="_blank"

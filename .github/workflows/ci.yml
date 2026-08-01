@@ -56,6 +56,7 @@ jobs:
       - run: npm run api:check
       - run: npm run compat:check
       - run: npm run contract:check
+      - run: npm run docs:check
       - run: npm run test:package
       - run: npm run test:quickstart
       - run: npm run benchmark:postgres

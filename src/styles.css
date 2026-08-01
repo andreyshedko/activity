@@ -70,12 +70,15 @@ button {
 }
 
 .starter-link {
-  margin-left: auto;
   color: #1f6f58;
   font-size: 0.82rem;
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.workspace-topbar > div:first-child + .starter-link {
+  margin-left: auto;
 }
 
 .starter-link:hover,

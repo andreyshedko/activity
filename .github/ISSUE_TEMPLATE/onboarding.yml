@@ -1,0 +1,61 @@
+name: Onboarding feedback
+description: Report time-to-first-activity and any setup friction. Never include secrets or customer data.
+title: "[Onboarding]: "
+labels: [onboarding, product-feedback]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing Activity. Please remove credentials, session values, database URLs, and customer data.
+  - type: input
+    id: activity_version
+    attributes:
+      label: Activity version
+      placeholder: 0.8.0
+    validations:
+      required: true
+  - type: dropdown
+    id: path
+    attributes:
+      label: Integration path
+      options:
+        - Next.js production starter
+        - StackBlitz
+        - Existing application
+        - Other framework recipe
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Node, React, framework, database, and operating system versions.
+      placeholder: Node 22, React 19, Next.js 16, PostgreSQL 16, macOS
+    validations:
+      required: true
+  - type: input
+    id: time
+    attributes:
+      label: Time to first persisted activity
+      placeholder: 11 minutes
+    validations:
+      required: true
+  - type: textarea
+    id: friction
+    attributes:
+      label: Where did you slow down or get stuck?
+      description: Include sanitized errors and the documentation page you were following.
+    validations:
+      required: true
+  - type: textarea
+    id: unclear
+    attributes:
+      label: What remained unclear?
+      description: Especially actor authority, resource authorization, and tenant isolation.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I removed credentials, tokens, database URLs, and customer data.
+          required: true

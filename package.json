@@ -92,7 +92,8 @@
     "compat:update": "node scripts/check-compatibility.mjs --update-baseline",
     "contract:check": "npm run build:sdk && node scripts/check-runtime-contract.mjs",
     "contract:update": "npm run build:sdk && node scripts/check-runtime-contract.mjs --update",
-    "verify": "npm test && npm run test:e2e && npm run build && npm run api:check && npm run compat:check && npm run contract:check && npm run test:package && npm run test:quickstart",
+    "docs:check": "node scripts/check-docs.mjs",
+    "verify": "npm test && npm run test:e2e && npm run build && npm run api:check && npm run compat:check && npm run contract:check && npm run docs:check && npm run test:package && npm run test:quickstart",
     "prepack": "npm run clean && npm run typecheck && npm run build:sdk && npm test",
     "stackblitz": "npm install --prefix examples/stackblitz && npm run dev --prefix examples/stackblitz -- --host 0.0.0.0"
   },
