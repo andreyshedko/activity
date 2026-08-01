@@ -121,6 +121,25 @@ transactions, content, metadata, and changes have the same behavior as the
 PostgreSQL adapter. See the
 [executable SQLite quick start](https://github.com/andreyshedko/activity/blob/main/examples/quickstart/sqlite.mjs).
 
+## MySQL
+
+Use the MySQL adapter with a `mysql2/promise` pool. The database driver remains
+an application dependency, so Activity does not add a runtime dependency:
+
+```ts
+import mysql from "mysql2/promise";
+import { createActivity } from "@feedclip/activity";
+import { mysqlAdapter } from "@feedclip/activity/adapters/mysql";
+
+const pool = mysql.createPool(process.env.MYSQL_URL!);
+const activity = createActivity({ adapter: mysqlAdapter(pool) });
+```
+
+Apply `@feedclip/activity/mysql-migration.sql` with multiple statements enabled
+before tracking data. The adapter supports atomic inserts, search, filters,
+offset pagination, and stable cursor pagination. See the
+[executable MySQL quick start](https://github.com/andreyshedko/activity/blob/main/examples/quickstart/mysql.mjs).
+
 ## Middleware
 
 Use middleware for application policies and server-side enrichment before an
@@ -455,10 +474,14 @@ before applying database changes.
 - `@feedclip/activity/react` — `ActivityPanel`
 - `@feedclip/activity/adapters/memory`
 - `@feedclip/activity/adapters/postgres`
+- `@feedclip/activity/adapters/sqlite`
+- `@feedclip/activity/adapters/mysql`
 - `@feedclip/activity/adapters/http`
 - `@feedclip/activity/http` — Fetch-compatible server handler
 - `@feedclip/activity/styles.css`
 - `@feedclip/activity/migration.sql`
+- `@feedclip/activity/sqlite-migration.sql`
+- `@feedclip/activity/mysql-migration.sql`
 
 ## Status
 

@@ -33,10 +33,14 @@
 | `@feedclip/activity/react` | React UI-компонент |
 | `@feedclip/activity/adapters/memory` | Memory adapter |
 | `@feedclip/activity/adapters/postgres` | PostgreSQL adapter |
+| `@feedclip/activity/adapters/sqlite` | SQLite adapter |
+| `@feedclip/activity/adapters/mysql` | MySQL adapter |
 | `@feedclip/activity/adapters/http` | Browser HTTP adapter |
 | `@feedclip/activity/http` | Fetch-compatible server handler |
 | `@feedclip/activity/styles.css` | Публичные стили компонента |
 | `@feedclip/activity/migration.sql` | Первая PostgreSQL migration |
+| `@feedclip/activity/sqlite-migration.sql` | Первая SQLite migration |
+| `@feedclip/activity/mysql-migration.sql` | Первая MySQL migration |
 
 Приложения НЕ ДОЛЖНЫ импортировать внутренние пакеты.
 

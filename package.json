@@ -50,6 +50,11 @@
       "import": "./dist/adapters/sqlite.js",
       "require": "./dist/adapters/sqlite.cjs"
     },
+    "./adapters/mysql": {
+      "types": "./dist/adapters/mysql.d.ts",
+      "import": "./dist/adapters/mysql.js",
+      "require": "./dist/adapters/mysql.cjs"
+    },
     "./adapters/http": {
       "types": "./dist/adapters/http.d.ts",
       "import": "./dist/adapters/http.js",
@@ -62,7 +67,8 @@
     },
     "./styles.css": "./dist/styles.css",
     "./migration.sql": "./migrations/001_activity_schema.sql",
-    "./sqlite-migration.sql": "./migrations/sqlite/001_activity_schema.sql"
+    "./sqlite-migration.sql": "./migrations/sqlite/001_activity_schema.sql",
+    "./mysql-migration.sql": "./migrations/mysql/001_activity_schema.sql"
   },
   "scripts": {
     "dev": "npm run build:demo && python3 -m http.server 5173 --bind 127.0.0.1 --directory demo-dist",
@@ -106,6 +112,7 @@
     "css.gg": "2.1.4",
     "esbuild": "0.25.12",
     "jsdom": "^29.1.1",
+    "mysql2": "^3.23.2",
     "pg": "^8.22.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

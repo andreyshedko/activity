@@ -7,6 +7,7 @@ const declarationFiles = [
   "dist/react.d.ts",
   "dist/adapters/memory.d.ts",
   "dist/adapters/postgres.d.ts",
+  "dist/adapters/mysql.d.ts",
   "dist/adapters/http.d.ts",
   "dist/http.d.ts",
 ];

@@ -1,4 +1,4 @@
-# PostgreSQL migrations
+# Database migrations
 
 Activity migrations are forward-only and shipped in the npm package. Apply them
 with the migration system already used by the host application. The initial schema
@@ -25,3 +25,8 @@ The SDK never runs migrations automatically.
 SQLite uses a separate migration history under `migrations/sqlite` and exposes
 its initial schema as `@feedclip/activity/sqlite-migration.sql`. Do not include
 that directory in a PostgreSQL migration runner.
+
+MySQL uses `migrations/mysql` and exposes its initial schema as
+`@feedclip/activity/mysql-migration.sql`. Apply it with a MySQL migration runner
+that supports multiple statements. MySQL timestamps are stored as UTC ISO 8601
+text so cursor ordering and round trips do not depend on connection time zones.
