@@ -1,0 +1,44 @@
+name: Bug report
+description: Report reproducible Activity behavior.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Activity version
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Node, React, framework, database, browser, and operating system versions.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link a repository or provide the smallest safe example.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I removed credentials, tokens, database URLs, and customer data.
+          required: true

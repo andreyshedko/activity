@@ -16,6 +16,9 @@ follows [Semantic Versioning](https://semver.org/).
 - Made the production starter install the published package directly, load its
   `.env.local` migration settings automatically, and linked it prominently from
   the npm README and GitHub Pages demo.
+- Added a documentation hub with authentication and server-framework recipes,
+  troubleshooting, customization, performance guidance, product comparisons,
+  and structured onboarding feedback.
 
 ## [0.8.0] - 2026-08-01
 

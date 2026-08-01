@@ -5,6 +5,7 @@
 [![license](https://img.shields.io/npm/l/@feedclip/activity)](https://github.com/andreyshedko/activity/blob/main/LICENSE)
 
 [Live demo](https://andreyshedko.github.io/activity/) ·
+[Documentation](https://github.com/andreyshedko/activity/tree/main/docs) ·
 [Production starter](https://github.com/andreyshedko/activity/tree/main/examples/nextjs) ·
 [StackBlitz](https://stackblitz.com/github/andreyshedko/activity?file=examples%2Fstackblitz%2Fsrc%2FApp.tsx&startScript=stackblitz) ·
 [npm](https://www.npmjs.com/package/@feedclip/activity)
@@ -15,6 +16,10 @@ customers, tickets, orders, and other business resources without rebuilding the 
 
 Activity History is the product; the framework-independent Activity Engine is the
 architecture underneath it.
+
+Use the [documentation hub](docs/README.md) for authentication, tenant isolation,
+framework recipes, troubleshooting, customization, performance and onboarding
+feedback.
 
 ## Install
 
