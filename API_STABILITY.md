@@ -19,8 +19,8 @@ The reviewed public surface is the declarations exported by:
 
 CI compares declarations with `api/public-api.snapshot.txt`, runtime error and
 HTTP behavior with `api/runtime-contract.snapshot.json`, and the complete package
-surface with `api/compatibility-baseline.json`. The compatibility baseline was
-generated from the published `@feedclip/activity@0.4.1` registry tarball and
+surface with `api/compatibility-baseline.json`. The compatibility baseline is
+generated from the published `@feedclip/activity@0.8.0` registry tarball and
 protects entrypoints, ESM/CommonJS exports, declarations, and released migrations.
 It also freezes exported CSS because documented custom properties are a public
 customization contract. Any intentional contract change requires an explicit
@@ -54,8 +54,9 @@ with `--activity-` and documented React props are public customization contracts
 - `npm run api:check` checks the reviewed declaration snapshot.
 - `npm run compat:check` checks backward compatibility with the published baseline.
 - `npm run contract:check` checks public errors and the HTTP wire contract.
-- `npm run compat:update` may only be used when deliberately adopting a new
-  published compatibility baseline after release review.
+- `npm run compat:update` refreshes the currently recorded published baseline
+  and may only be used after release review. Set `API_BASELINE_PACKAGE` to adopt
+  a different published version explicitly.
 - A reviewed minor release candidate may use
   `API_BASELINE_PACKAGE=. npm run compat:update` when it intentionally adds
   public declarations; existing consumer scenarios must remain covered by tests.
