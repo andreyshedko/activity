@@ -111,7 +111,9 @@ test("MySQL query supports filters, offset, cursor, JSON, and immutable records"
   const second = await adapter.query({ resource, limit: 1, cursor: first.nextCursor });
   assert.equal(second.hasMore, false);
   assert.equal(second.nextCursor, undefined);
+  assert.match(statements.find(({ sql }) => sql.includes("offset 2"))!.sql, /limit 2 offset 2/);
   assert.match(statements.find(({ sql }) => sql.includes("(created_at < ?"))!.sql, /id < \?/);
+  assert.match(statements.find(({ sql }) => sql.includes("(created_at < ?"))!.sql, /limit 2$/);
 });
 
 test("MySQL query rejects malformed rows, changes, and JSON", async () => {

@@ -708,12 +708,9 @@ export function mysqlAdapter(client: MySQLClient): StorageAdapter {
         params.push(timestamp, timestamp, cursor.id);
       }
       const limit = normalized.limit as number;
-      params.push(limit + 1);
-      let pagination = "limit ?";
-      if (!normalized.cursor) {
-        pagination += " offset ?";
-        params.push(normalized.offset as number);
-      }
+      const pagination = normalized.cursor
+        ? `limit ${limit + 1}`
+        : `limit ${limit + 1} offset ${normalized.offset as number}`;
       const [rowResult] = await client.execute(`select * from activity_entries
         where ${where.join(" and ")} order by created_at desc, id desc ${pagination}`, params);
       if (!Array.isArray(rowResult)) {
