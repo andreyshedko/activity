@@ -1,6 +1,6 @@
 {
   "packageName": "@feedclip/activity",
-  "packageVersion": "0.7.0",
+  "packageVersion": "0.7.1",
   "entrypoints": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -129,6 +129,6 @@
   "publicAssets": {
     "dist/styles.css": "27d2d4e8cb23d040ffb14f55e10401f4b04fd2b27974e5c4086d0a804d6a9745"
   },
-  "baseline": "@feedclip/activity@0.7.0",
+  "baseline": "@feedclip/activity@0.7.1",
   "generatedFrom": "reviewed local release candidate"
 }
