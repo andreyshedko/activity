@@ -5,6 +5,10 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Updated the StackBlitz installation example to the published `0.8.0` package.
+
 ## [0.8.0] - 2026-08-01
 
 ### Added
