@@ -60,6 +60,8 @@ jobs:
       - run: npm run test:quickstart
       - run: npm run benchmark:postgres
       - run: npm ci --prefix examples/nextjs
+      - run: npm run db:migrate --prefix examples/nextjs
+      - run: npm test --prefix examples/nextjs
       - run: npm run build --prefix examples/nextjs
       - run: npm ci --prefix examples/stackblitz
       - run: npm run build --prefix examples/stackblitz

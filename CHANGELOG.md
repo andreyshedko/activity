@@ -10,6 +10,9 @@ follows [Semantic Versioning](https://semver.org/).
 - Updated the StackBlitz installation example to the published `0.8.0` package.
 - Updated compatibility documentation for MySQL and the published `0.8.0`
   baseline, and made `compat:update` refresh the recorded baseline by default.
+- Reworked the Next.js example into a production starter with signed sessions,
+  resource authorization, tenant isolation, trusted server-side tracking, tests,
+  and a five-minute PostgreSQL setup.
 
 ## [0.8.0] - 2026-08-01
 

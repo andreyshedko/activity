@@ -1,31 +1,25 @@
-import { Pool } from "pg";
-import { postgresAdapter } from "@feedclip/activity/adapters/postgres";
 import { createActivityHttpHandler } from "@feedclip/activity/http";
-
-const connectionString = process.env.DATABASE_URL;
-const pool = connectionString ? new Pool({ connectionString }) : null;
-
-function handler() {
-  if (!pool) {
-    return async () => Response.json(
-      { error: "DATABASE_URL is not configured" },
-      { status: 503 },
-    );
-  }
-
-  return createActivityHttpHandler({
-    adapter: postgresAdapter(pool),
-    authorize: ({ request }) => {
-      // Replace this demo check with the application's session and tenant policy.
-      return request.headers.get("x-activity-demo-user") === "demo";
-    },
-  });
-}
+import { getSessionFromRequest } from "../../../lib/auth";
+import { canAccessInvoice } from "../../../lib/demo-data";
+import { createTenantAdapter } from "../../../lib/tenant-storage";
+import { getStorage } from "../../../lib/storage";
 
 export async function GET(request: Request) {
-  return handler()(request);
+  const session = getSessionFromRequest(request);
+  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  const handler = createActivityHttpHandler({
+    adapter: createTenantAdapter(getStorage(), session.tenantId),
+    authorize: ({ operation, resource }) =>
+      operation === "query" && canAccessInvoice(session, resource),
+  });
+
+  return handler(request);
 }
 
-export async function POST(request: Request) {
-  return handler()(request);
+export function POST() {
+  return Response.json(
+    { error: "Track activity from trusted server code, not the browser" },
+    { status: 405, headers: { allow: "GET" } },
+  );
 }
