@@ -5,6 +5,12 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-08-01
+
+### Fixed
+
+- Fixed the provenance badge rendered in the npm README.
+
 ## [0.7.0] - 2026-08-01
 
 ### Added
@@ -142,7 +148,8 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Initial activity engine, React panel, memory adapter, and PostgreSQL adapter.
 
-[Unreleased]: https://github.com/andreyshedko/activity/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/andreyshedko/activity/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/andreyshedko/activity/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/andreyshedko/activity/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/andreyshedko/activity/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/andreyshedko/activity/compare/v0.5.0...v0.5.1
