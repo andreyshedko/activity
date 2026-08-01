@@ -21,6 +21,7 @@ try {
   tarball = join(root, artifact.filename);
   const names = artifact.files.map(({ path }) => path);
   const required = [
+    "bin/activity-init.mjs",
     "dist/index.js",
     "dist/index.cjs",
     "dist/index.d.ts",
@@ -34,6 +35,12 @@ try {
     "dist/adapters/mysql.cjs",
     "dist/http.js",
     "dist/http.cjs",
+    "dist/headless.js",
+    "dist/headless.cjs",
+    "dist/headless.d.ts",
+    "dist/reliability.js",
+    "dist/reliability.cjs",
+    "dist/reliability.d.ts",
     "dist/styles.css",
     "migrations/001_activity_schema.sql",
     "migrations/sqlite/001_activity_schema.sql",
@@ -75,6 +82,8 @@ try {
     import { sqliteAdapter } from "@feedclip/activity/adapters/sqlite";
     import { mysqlAdapter } from "@feedclip/activity/adapters/mysql";
     import { createActivityHttpHandler } from "@feedclip/activity/http";
+    import { createActivityFeed } from "@feedclip/activity/headless";
+    import { createTelemetryListener } from "@feedclip/activity/reliability";
     import { createElement } from "react";
     import { renderToStaticMarkup } from "react-dom/server";
     assert.equal(typeof activity.createActivity, "function");
@@ -83,6 +92,8 @@ try {
     assert.equal(typeof sqliteAdapter, "function");
     assert.equal(typeof mysqlAdapter, "function");
     assert.equal(typeof createActivityHttpHandler, "function");
+    assert.equal(typeof createActivityFeed, "function");
+    assert.equal(typeof createTelemetryListener, "function");
     const client = activity.createActivity({ adapter: createMemoryStorageAdapter() });
     assert.match(renderToStaticMarkup(createElement(ActivityPanel, {
       activity: client,
@@ -105,6 +116,8 @@ try {
     assert.equal(typeof require("@feedclip/activity/adapters/sqlite").sqliteAdapter, "function");
     assert.equal(typeof require("@feedclip/activity/adapters/mysql").mysqlAdapter, "function");
     assert.equal(typeof require("@feedclip/activity/http").createActivityHttpHandler, "function");
+    assert.equal(typeof require("@feedclip/activity/headless").createActivityFeed, "function");
+    assert.equal(typeof require("@feedclip/activity/reliability").trackBatch, "function");
   `);
   run("node", ["verify.cjs"], work);
   await rm(tarball, { force: true });

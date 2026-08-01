@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
-const examples = ["memory.mjs", "http.mjs", "postgres.mjs", "sqlite.mjs", "mysql.mjs"];
+const examples = ["memory.mjs", "headless.mjs", "http.mjs", "postgres.mjs", "sqlite.mjs", "mysql.mjs"];
 
 for (const example of examples) {
   execFileSync("node", [resolve(root, "examples/quickstart", example)], {

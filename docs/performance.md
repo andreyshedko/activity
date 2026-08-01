@@ -14,6 +14,7 @@ then measures 20 samples for each of:
 - a cursor page;
 - an action-filtered page;
 - resource-scoped full-text search.
+- single-record transactional writes.
 
 The default contract is p95 below 100 ms per scenario on a GitHub Actions
 PostgreSQL service:

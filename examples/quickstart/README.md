@@ -2,9 +2,10 @@
 
 These examples are the complete runnable versions of the snippets in the root
 README. The project's `test:quickstart` command builds the package and executes
-all five against its public package entrypoints.
+all six against its public package entrypoints.
 
 - `memory.mjs` — in-process setup with no infrastructure
+- `headless.mjs` — headless feed/export plus redaction, batch and telemetry
 - `postgres.mjs` — bundled migration and persistent storage
 - `http.mjs` — browser adapter to an authorized Fetch-compatible handler
 - `sqlite.mjs` — local SQLite persistence through Node's built-in driver

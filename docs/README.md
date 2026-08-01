@@ -7,16 +7,21 @@ while keeping credentials and data in the host application.
 
 | Goal | Guide |
 |---|---|
+| Generate integration files | `npx @feedclip/activity init` |
 | Evaluate the UI without infrastructure | [Five-minute quick start](../README.md#five-minute-quick-start) |
 | Build a production Next.js integration | [Next.js + PostgreSQL starter](../examples/nextjs/README.md) |
 | Connect authentication and tenants | [Authentication recipes](authentication.md) |
 | Use another server framework | [Framework recipes](frameworks.md) |
 | Diagnose an integration | [Troubleshooting](troubleshooting.md) |
 | Customize the React panel | [React customization](customization.md) |
+| Build a custom UI or real-time feed | [Headless primitives](headless.md) |
+| Add redaction, telemetry and batch tracking | [Reliability and operations](reliability.md) |
 | Validate scale and latency | [Performance](performance.md) |
 | Choose the right use case | [Use cases and comparison](use-cases.md) |
 | Present or record the product | [Demo and recording script](demo-script.md) |
 | Report onboarding results | [Feedback](feedback.md) |
+| Run measured integrations | [Integration study kit](adoption-study.md) |
+| Evaluate sustainable packaging | [Commercial options](commercial-options.md) |
 
 ## Integration model
 

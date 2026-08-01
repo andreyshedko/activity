@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import { performance } from "node:perf_hooks";
 import pg from "pg";
 import { postgresAdapter } from "../dist/adapters/postgres.js";
@@ -47,16 +48,45 @@ try {
   ];
   const results = [];
   for (const scenario of scenarios) results.push(await measure(adapter, scenario, thresholdMs));
+  const write = await measureWrites(adapter, thresholdMs);
   const report = {
     datasetSize,
     generatedAt: new Date().toISOString(),
     samplesPerScenario: 20,
     thresholdMs,
     scenarios: results,
+    write,
   };
   console.log(JSON.stringify(report, null, 2));
 } finally {
   await pool.end();
+}
+
+async function measureWrites(adapter, threshold) {
+  const samples = [];
+  for (let index = 0; index < 20; index += 1) {
+    const entry = Object.freeze({
+      id: randomUUID(),
+      resource: Object.freeze({ type: "benchmark-write", id: "resource_1" }),
+      action: "update",
+      actor: Object.freeze({ type: "system", id: "benchmark", name: "Benchmark" }),
+      timestamp: new Date(),
+      changes: [Object.freeze({ field: "sequence", label: "Sequence", after: index, valueType: "number" })],
+    });
+    const start = performance.now();
+    await adapter.insert(entry);
+    samples.push(performance.now() - start);
+  }
+  samples.sort((a, b) => a - b);
+  const median = samples[Math.floor(samples.length / 2)];
+  const p95 = samples[Math.ceil(samples.length * 0.95) - 1];
+  if (p95 > threshold) throw new Error(`single-write p95 ${p95.toFixed(2)}ms exceeds ${threshold}ms`);
+  return {
+    name: "single-write",
+    samples: samples.length,
+    medianMs: Number(median.toFixed(2)),
+    p95Ms: Number(p95.toFixed(2)),
+  };
 }
 
 async function measure(adapter, scenario, threshold) {
