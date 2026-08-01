@@ -1,7 +1,7 @@
 # Public API
 
 > **Status:** Reviewed pre-1.0 surface
-> **Compatibility baseline:** `@feedclip/activity@0.4.1`
+> **Compatibility baseline:** `@feedclip/activity@0.8.0`
 > **Depends on:** [`constitution.md`](./constitution.md), [`product.md`](./product.md)
 
 ## 1. Назначение

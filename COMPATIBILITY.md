@@ -8,6 +8,7 @@
 | React | 18 and 19 | 18 and 19 on both Node versions |
 | PostgreSQL | 14–17 | 14, 15, 16, and 17 |
 | SQLite | Synchronous `prepare/run/get/all` drivers | Node 22 built-in SQLite |
+| MySQL | `mysql2/promise`-compatible pools and connections | MySQL 8.0 and 8.4 |
 | Module systems | ESM and CommonJS | Both package builds |
 | Browsers | Current evergreen browsers | Chromium, Firefox, and WebKit via Playwright |
 | Next.js | App Router consumer | Production smoke build |

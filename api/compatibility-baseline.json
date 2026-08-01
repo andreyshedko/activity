@@ -148,5 +148,5 @@
     "dist/styles.css": "27d2d4e8cb23d040ffb14f55e10401f4b04fd2b27974e5c4086d0a804d6a9745"
   },
   "baseline": "@feedclip/activity@0.8.0",
-  "generatedFrom": "reviewed local release candidate"
+  "generatedFrom": "npm registry tarball"
 }

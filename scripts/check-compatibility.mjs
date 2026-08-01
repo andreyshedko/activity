@@ -9,7 +9,8 @@ import { pathToFileURL } from "node:url";
 
 const root = resolve(import.meta.dirname, "..");
 const baselinePath = join(root, "api/compatibility-baseline.json");
-const baselinePackage = process.env.API_BASELINE_PACKAGE || "@feedclip/activity@0.4.1";
+const storedBaseline = JSON.parse(await readFile(baselinePath, "utf8"));
+const baselinePackage = process.env.API_BASELINE_PACKAGE || storedBaseline.baseline;
 const update = process.argv.includes("--update-baseline");
 
 if (update) {
@@ -35,7 +36,7 @@ if (update) {
     await rm(work, { force: true, recursive: true });
   }
 } else {
-  const baseline = JSON.parse(await readFile(baselinePath, "utf8"));
+  const baseline = storedBaseline;
   const current = await collectSurface(root);
 
   for (const [entrypoint, targets] of Object.entries(baseline.entrypoints)) {

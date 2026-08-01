@@ -8,6 +8,8 @@ follows [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Updated the StackBlitz installation example to the published `0.8.0` package.
+- Updated compatibility documentation for MySQL and the published `0.8.0`
+  baseline, and made `compat:update` refresh the recorded baseline by default.
 
 ## [0.8.0] - 2026-08-01
 
