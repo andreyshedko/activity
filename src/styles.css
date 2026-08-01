@@ -69,6 +69,21 @@ button {
   font-size: 0.82rem;
 }
 
+.starter-link {
+  margin-left: auto;
+  color: #1f6f58;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.starter-link:hover,
+.starter-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .eyebrow {
   margin: 0 0 7px;
   color: #68717c;

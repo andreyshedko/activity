@@ -128,6 +128,14 @@ export function App() {
           <strong>Activity History</strong>
           <span>Drop-in audit trails for React applications</span>
         </div>
+        <a
+          className="starter-link"
+          href="https://github.com/andreyshedko/activity/tree/main/examples/nextjs"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Production starter
+        </a>
         <div className="demo-controls" aria-label="Demo state">
           {(["default", "loading", "empty", "error"] as DemoState[]).map((item) => (
             <button

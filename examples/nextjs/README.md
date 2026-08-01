@@ -17,7 +17,37 @@ business operation on the server, derives the actor and tenant from a signed
 
 ## Run in five minutes
 
-Requirements: Node.js 20+, PostgreSQL, and the repository checked out locally.
+Requirements: Node.js 20+ and PostgreSQL. The starter installs the public npm
+package, so it does not require building the Activity repository.
+
+```bash
+git clone https://github.com/andreyshedko/activity.git
+cd activity/examples/nextjs
+createdb activity_starter
+cp .env.example .env.local
+npm install
+npm run db:migrate
+npm run dev
+```
+
+Generate a session secret and paste it into `.env.local` before migration:
+
+```bash
+openssl rand -base64 32
+```
+
+The final `.env.local` should contain:
+
+```dotenv
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/activity_starter
+ACTIVITY_SESSION_SECRET=replace-with-the-generated-secret
+```
+
+There is no root build step and no manual environment export. `db:migrate`
+loads `.env.local` itself and applies the migration shipped in
+`@feedclip/activity@0.8.0`.
+
+If the repository is already cloned, start here:
 
 ```bash
 cd examples/nextjs
@@ -31,9 +61,8 @@ Open [http://localhost:3000](http://localhost:3000), choose Acme, and record a
 status change. Switch to Globex: it uses the same public invoice ID but sees a
 different history.
 
-Create the database first if it does not exist, or replace `DATABASE_URL` in
-`.env.local` with an existing PostgreSQL connection. Generate the session secret
-with `openssl rand -base64 32`.
+Replace `DATABASE_URL` with an existing PostgreSQL connection when you do not
+want to create a local database.
 
 ## Security model
 
