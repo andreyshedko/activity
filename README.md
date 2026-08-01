@@ -93,6 +93,12 @@ That is the complete in-memory integration. See the
 or continue with [PostgreSQL](#postgresql) for persistence and the
 [HTTP adapter](#browser-to-server-http-adapter) when the panel runs in a browser.
 
+For a complete production boundary, use the
+[Next.js + PostgreSQL starter](https://github.com/andreyshedko/activity/tree/main/examples/nextjs).
+It demonstrates signed sessions, resource authorization, tenant-isolated storage,
+server-derived actors, schema migration, and a browser panel that cannot forge
+activity records.
+
 ## SQLite
 
 Use SQLite for desktop applications, local-first services, single-node
