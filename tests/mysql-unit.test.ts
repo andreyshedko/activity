@@ -108,6 +108,10 @@ test("MySQL query supports filters, offset, cursor, JSON, and immutable records"
   assert.equal(first.entries[0].content?.type, "comment");
   assert.equal(first.entries[0].metadata?.tenant, "one");
   assert.equal(Object.isFrozen(first.entries[0]), true);
+  assert.match(
+    statements.find(({ sql }) => sql.trimStart().startsWith("select\n    field"))!.sql,
+    /cast\(before_value as char\)/,
+  );
   const second = await adapter.query({ resource, limit: 1, cursor: first.nextCursor });
   assert.equal(second.hasMore, false);
   assert.equal(second.nextCursor, undefined);

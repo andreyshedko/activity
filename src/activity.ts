@@ -1125,7 +1125,10 @@ async function mapMySQLRecord(client: MySQLClient, row: unknown): Promise<Activi
     throw new ActivityError("STORAGE_FAILURE", "Invalid activity row returned by storage");
   }
   const [changeResult] = await client.execute(`select
-    field, label, before_value, after_value, value_type
+    field, label,
+    cast(before_value as char) as before_value,
+    cast(after_value as char) as after_value,
+    value_type
     from activity_changes where entry_id = ? order by position`, [String(row.id)]);
   if (!Array.isArray(changeResult)) {
     throw new ActivityError("STORAGE_FAILURE", "Invalid changes returned by MySQL storage");
