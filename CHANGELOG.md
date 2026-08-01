@@ -13,6 +13,9 @@ follows [Semantic Versioning](https://semver.org/).
 - Reworked the Next.js example into a production starter with signed sessions,
   resource authorization, tenant isolation, trusted server-side tracking, tests,
   and a five-minute PostgreSQL setup.
+- Made the production starter install the published package directly, load its
+  `.env.local` migration settings automatically, and linked it prominently from
+  the npm README and GitHub Pages demo.
 
 ## [0.8.0] - 2026-08-01
 

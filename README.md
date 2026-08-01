@@ -5,6 +5,7 @@
 [![license](https://img.shields.io/npm/l/@feedclip/activity)](https://github.com/andreyshedko/activity/blob/main/LICENSE)
 
 [Live demo](https://andreyshedko.github.io/activity/) ·
+[Production starter](https://github.com/andreyshedko/activity/tree/main/examples/nextjs) ·
 [StackBlitz](https://stackblitz.com/github/andreyshedko/activity?file=examples%2Fstackblitz%2Fsrc%2FApp.tsx&startScript=stackblitz) ·
 [npm](https://www.npmjs.com/package/@feedclip/activity)
 
@@ -93,11 +94,24 @@ That is the complete in-memory integration. See the
 or continue with [PostgreSQL](#postgresql) for persistence and the
 [HTTP adapter](#browser-to-server-http-adapter) when the panel runs in a browser.
 
-For a complete production boundary, use the
-[Next.js + PostgreSQL starter](https://github.com/andreyshedko/activity/tree/main/examples/nextjs).
+## Production starter
+
+For a complete integration, use the
+[Next.js + PostgreSQL production starter](https://github.com/andreyshedko/activity/tree/main/examples/nextjs).
 It demonstrates signed sessions, resource authorization, tenant-isolated storage,
 server-derived actors, schema migration, and a browser panel that cannot forge
-activity records.
+activity records. It installs the public npm package and includes an executable
+five-minute setup, not pseudocode.
+
+```bash
+git clone https://github.com/andreyshedko/activity.git
+cd activity/examples/nextjs
+createdb activity_starter
+cp .env.example .env.local
+npm install
+npm run db:migrate
+npm run dev
+```
 
 ## SQLite
 
