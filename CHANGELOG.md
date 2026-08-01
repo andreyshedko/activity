@@ -11,6 +11,11 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Fixed the provenance badge rendered in the npm README.
 
+### Changed
+
+- Updated the StackBlitz installation example from `0.5.0` to the current
+  published `0.7.0` package.
+
 ## [0.7.0] - 2026-08-01
 
 ### Added
