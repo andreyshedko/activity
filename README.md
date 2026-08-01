@@ -21,6 +21,11 @@ Use the [documentation hub](docs/README.md) for authentication, tenant isolation
 framework recipes, troubleshooting, customization, performance and onboarding
 feedback.
 
+![Activity demo with the live configurator](docs/assets/activity-configurator.png)
+
+The demo is the real package UI, not a static mock. Use the configurator to try
+themes, density, locale and accent color, then copy the generated JSX and CSS.
+
 ## Install
 
 ```bash

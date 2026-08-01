@@ -1,5 +1,11 @@
 # Use cases and comparison
 
+![Activity configured for an invoice history](assets/activity-configurator.png)
+
+The [live demo](https://andreyshedko.github.io/activity/) uses the public component
+API and lets evaluators change theme, density, locale and accent color before
+copying the resulting integration code.
+
 ## Best fit
 
 - invoice, customer, ticket, order and project detail pages;
@@ -27,3 +33,15 @@
 Activity deliberately avoids domain-specific invoice or ticket code. Stable
 actions plus resource, actor, changes and content let the host application retain
 its own domain model.
+
+## Evaluation paths
+
+| If you are building | Start with | Validate next |
+|---|---|---|
+| SaaS billing | Invoice resource in the live demo | tenant isolation and server-derived actors in the production starter |
+| Support tooling | Ticket resource and content filter | comments, attachments, keyboard navigation and error recovery |
+| Internal operations | Customer or payment resource | search, cursor pagination and PostgreSQL performance contract |
+| Local-first or desktop software | memory quick start | SQLite adapter and custom attachment handling |
+
+These are reproducible product scenarios, not customer endorsements. Public case
+studies should only be added after a user has approved their name, result and logo.

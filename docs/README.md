@@ -15,6 +15,7 @@ while keeping credentials and data in the host application.
 | Customize the React panel | [React customization](customization.md) |
 | Validate scale and latency | [Performance](performance.md) |
 | Choose the right use case | [Use cases and comparison](use-cases.md) |
+| Present or record the product | [Demo and recording script](demo-script.md) |
 | Report onboarding results | [Feedback](feedback.md) |
 
 ## Integration model

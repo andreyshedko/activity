@@ -23,6 +23,8 @@ follows [Semantic Versioning](https://semver.org/).
   cursor, action-filter, and search queries, with a JSON CI artifact.
 - Added a live ActivityPanel configurator for theme, density, locale and accent,
   with generated copyable JSX and CSS on GitHub Pages.
+- Added a real-demo screenshot, evaluation paths, and a reproducible 60-second
+  product walkthrough for honest product proof and release recording.
 
 ## [0.8.0] - 2026-08-01
 
