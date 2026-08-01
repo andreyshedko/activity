@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   ActivityPanel,
   type ActivityPanelQuery,
   type ActivityPanelTheme,
+  type ActivityPanelVariant,
 } from "./ActivityPanel";
 import { createActivity, createMemoryStorageAdapter, type Action } from "./activity";
 import { activityEntries, demoResources } from "./mockData";
@@ -14,6 +15,9 @@ type AdapterMode = "memory" | "postgres";
 export function App() {
   const [state, setState] = useState<DemoState>("default");
   const [theme, setTheme] = useState<ActivityPanelTheme>("light");
+  const [variant, setVariant] = useState<ActivityPanelVariant>("default");
+  const [locale, setLocale] = useState("en-US");
+  const [accent, setAccent] = useState("#24775e");
   const [selectedResourceId, setSelectedResourceId] = useState(
     demoResources[0].resource.id,
   );
@@ -201,6 +205,17 @@ export function App() {
         ))}
       </nav>
 
+      <Configurator
+        accent={accent}
+        locale={locale}
+        onAccentChange={setAccent}
+        onLocaleChange={setLocale}
+        onThemeChange={setTheme}
+        onVariantChange={setVariant}
+        theme={theme}
+        variant={variant}
+      />
+
       <section className="workspace-grid">
         <section className="resource-panel" aria-label="Resource details">
           <div className="resource-panel__header">
@@ -314,7 +329,10 @@ await activity.track({
           </form>
         </section>
 
-        <div className="activity-column">
+        <div
+          className="activity-column"
+          style={{ "--config-accent": accent } as CSSProperties}
+        >
           <ActivityPanel
             activity={activity}
             expandedEntryId={expandedEntryId}
@@ -324,8 +342,10 @@ await activity.track({
             onQueryChange={setLastQuery}
             pageSize={4}
             paginationMode="cursor"
+            locale={locale}
             resource={selectedResource.resource}
             theme={theme}
+            variant={variant}
           />
           {openedAttachment ? (
             <p className="attachment-demo-status" role="status">
@@ -336,6 +356,116 @@ await activity.track({
         </div>
       </section>
     </main>
+  );
+}
+
+function Configurator({
+  accent,
+  locale,
+  onAccentChange,
+  onLocaleChange,
+  onThemeChange,
+  onVariantChange,
+  theme,
+  variant,
+}: {
+  accent: string;
+  locale: string;
+  onAccentChange: (value: string) => void;
+  onLocaleChange: (value: string) => void;
+  onThemeChange: (value: ActivityPanelTheme) => void;
+  onVariantChange: (value: ActivityPanelVariant) => void;
+  theme: ActivityPanelTheme;
+  variant: ActivityPanelVariant;
+}) {
+  const [copied, setCopied] = useState<"jsx" | "css" | null>(null);
+  const jsx = `<ActivityPanel
+  activity={activity}
+  resource={resource}
+  theme="${theme}"
+  variant="${variant}"
+  locale="${locale}"
+  pageSize={20}
+  paginationMode="cursor"
+/>`;
+  const css = `.activity-host .activity-panel {
+  --activity-color-accent: ${accent};
+}`;
+
+  async function copy(kind: "jsx" | "css", value: string) {
+    await navigator.clipboard.writeText(value);
+    setCopied(kind);
+    window.setTimeout(() => setCopied(null), 1500);
+  }
+
+  return (
+    <section
+      aria-label="Interactive configurator"
+      className="configurator"
+    >
+      <div className="configurator__intro">
+        <p className="eyebrow">Interactive configurator</p>
+        <h2 id="configurator-title">Fit Activity to your product, then copy the code.</h2>
+        <p>The live panel below updates immediately. Generated code uses only public props and CSS variables.</p>
+      </div>
+      <div className="configurator__controls">
+        <label>
+          Theme
+          <select value={theme} onChange={(event) => onThemeChange(event.currentTarget.value as ActivityPanelTheme)}>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="system">System</option>
+          </select>
+        </label>
+        <label>
+          Density
+          <select value={variant} onChange={(event) => onVariantChange(event.currentTarget.value as ActivityPanelVariant)}>
+            <option value="default">Default</option>
+            <option value="compact">Compact</option>
+            <option value="comfortable">Comfortable</option>
+          </select>
+        </label>
+        <label>
+          Locale
+          <select value={locale} onChange={(event) => onLocaleChange(event.currentTarget.value)}>
+            <option value="en-US">English (US)</option>
+            <option value="de-DE">Deutsch</option>
+            <option value="cs-CZ">Čeština</option>
+            <option value="ru-RU">Русский</option>
+          </select>
+        </label>
+        <label>
+          Accent
+          <span className="color-control">
+            <input type="color" value={accent} onChange={(event) => onAccentChange(event.currentTarget.value)} />
+            <code>{accent}</code>
+          </span>
+        </label>
+      </div>
+      <div className="configurator__code">
+        <CodeCard label="JSX" value={jsx} copied={copied === "jsx"} onCopy={() => copy("jsx", jsx)} />
+        <CodeCard label="CSS" value={css} copied={copied === "css"} onCopy={() => copy("css", css)} />
+      </div>
+    </section>
+  );
+}
+
+function CodeCard({
+  copied,
+  label,
+  onCopy,
+  value,
+}: {
+  copied: boolean;
+  label: string;
+  onCopy: () => void;
+  value: string;
+}) {
+  return (
+    <div className="configurator__code-card">
+      <div><strong>{label}</strong><button type="button" onClick={onCopy}>{copied ? "Copied" : "Copy"}</button></div>
+      <pre><code>{value}</code></pre>
+    </div>
   );
 }
 

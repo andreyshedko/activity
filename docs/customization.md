@@ -21,14 +21,12 @@ Import the package stylesheet once and override documented variables at the host
 boundary:
 
 ```css
-.invoice-activity {
-  --activity-accent: #2563eb;
-  --activity-radius: 10px;
+.invoice-activity .activity-panel {
+  --activity-color-accent: #2563eb;
 }
 ```
 
-Use the [live demo](https://andreyshedko.github.io/activity/) to exercise themes,
-search, filters, loading/empty/error states, keyboard navigation, attachments and
-entry expansion. The interactive copy/paste configurator is tracked as the next
-demo improvement; until then, keep overrides close to the documented CSS custom
-properties rather than internal class names.
+Use the [live configurator](https://andreyshedko.github.io/activity/) to choose
+theme, density, locale and accent, preview the result, and copy generated JSX/CSS.
+The same demo exercises search, filters, loading/empty/error states, keyboard
+navigation, attachments and entry expansion.

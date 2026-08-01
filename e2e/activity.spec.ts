@@ -94,6 +94,20 @@ test("switches light, dark, and system themes", async ({ page }) => {
   await expect(panel).toHaveAttribute("data-activity-theme", "system");
 });
 
+test("configures the panel and generates copyable public API code", async ({ page }) => {
+  const configurator = page.getByRole("region", { name: "Interactive configurator" });
+  await configurator.getByLabel("Density").selectOption("comfortable");
+  await configurator.getByLabel("Locale").selectOption("de-DE");
+  await configurator.getByLabel("Accent").fill("#ff0000");
+
+  const panel = page.getByRole("region", { name: "Activity history" });
+  await expect(panel).toHaveClass(/activity-panel--comfortable/);
+  await expect(configurator).toContainText('variant="comfortable"');
+  await expect(configurator).toContainText('locale="de-DE"');
+  await expect(configurator).toContainText("--activity-color-accent: #ff0000");
+  await expect(panel).toHaveCSS("--activity-color-accent", "#ff0000");
+});
+
 test("recovers from a query error through retry", async ({ page }) => {
   await page.getByRole("button", { name: "error", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Activity could not load" })).toBeVisible();
