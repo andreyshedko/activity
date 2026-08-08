@@ -1,0 +1,60 @@
+name: Activity Cloud design partner
+description: Describe a real managed Activity use case. Do not include secrets, customer data, or private architecture.
+title: "[Cloud design partner]: "
+labels: [cloud-research, product-feedback]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Activity Cloud is research, not a production service or sales commitment. Share only information you are authorized to publish.
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Resource history use case
+      description: What resources and business events need an activity history?
+    validations:
+      required: true
+  - type: dropdown
+    id: volume
+    attributes:
+      label: Expected events per month
+      options:
+        - Under 10,000
+        - 10,000–100,000
+        - 100,000–1 million
+        - More than 1 million
+        - Unknown
+    validations:
+      required: true
+  - type: dropdown
+    id: retention
+    attributes:
+      label: Required retention
+      options:
+        - 7 days
+        - 30–90 days
+        - Up to one year
+        - More than one year
+        - Unknown
+    validations:
+      required: true
+  - type: textarea
+    id: managed_value
+    attributes:
+      label: What should managed Cloud remove from your workload?
+      description: For example storage operations, backups, retention, exports, authorization sessions, or monitoring.
+    validations:
+      required: true
+  - type: textarea
+    id: blockers
+    attributes:
+      label: Security, legal, or purchasing blockers
+      description: Do not include confidential requirements; summarize categories only.
+  - type: checkboxes
+    id: contact
+    attributes:
+      label: Follow-up
+      options:
+        - label: I am willing to discuss this use case in a short design-partner call.
+        - label: I removed secrets, personal data, and confidential company information.
+          required: true
