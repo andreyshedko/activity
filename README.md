@@ -21,6 +21,10 @@ Use the [documentation hub](docs/README.md) for authentication, tenant isolation
 framework recipes, troubleshooting, customization, performance and onboarding
 feedback.
 
+Activity is an independent open-source product. It does not require FeedClip or
+FeedClip Cloud. A future managed Activity service may reuse private platform
+infrastructure while retaining separate positioning, onboarding and data contracts.
+
 ![Activity demo with the live configurator](docs/assets/activity-configurator.png)
 
 The demo is the real package UI, not a static mock. Use the configurator to try

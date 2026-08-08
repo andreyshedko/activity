@@ -8,15 +8,18 @@ const files = [
   "docs/authentication.md",
   "docs/adoption-study.md",
   "docs/commercial-options.md",
+  "docs/cloud-mvp.md",
   "docs/customization.md",
   "docs/feedback.md",
   "docs/frameworks.md",
   "docs/headless.md",
+  "docs/launch-kit.md",
   "docs/performance.md",
   "docs/reliability.md",
   "docs/troubleshooting.md",
   "docs/use-cases.md",
   "examples/nextjs/README.md",
+  "OWNER_ACTIONS.md",
 ];
 
 for (const file of files) {

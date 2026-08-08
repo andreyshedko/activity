@@ -1,0 +1,32 @@
+name: Activity showcase
+description: Share a real Activity integration and optionally grant permission for a public case study.
+title: "[Showcase]: "
+labels: [showcase, product-feedback]
+body:
+  - type: textarea
+    id: product
+    attributes:
+      label: What did you build?
+      description: Describe the resource history and integration path. Do not include customer data.
+    validations:
+      required: true
+  - type: input
+    id: time
+    attributes:
+      label: Time to first real event
+      placeholder: 12 minutes
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Measured outcome and remaining friction
+      description: Include only results you can substantiate.
+    validations:
+      required: true
+  - type: checkboxes
+    id: permission
+    attributes:
+      label: Publication permission
+      options:
+        - label: You may link to this public issue from Activity documentation.
+        - label: Contact me before using my name, company, quotation, result, screenshot, or logo.
+          required: true

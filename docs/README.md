@@ -22,6 +22,8 @@ while keeping credentials and data in the host application.
 | Report onboarding results | [Feedback](feedback.md) |
 | Run measured integrations | [Integration study kit](adoption-study.md) |
 | Evaluate sustainable packaging | [Commercial options](commercial-options.md) |
+| Define the managed product boundary | [Activity Cloud MVP](cloud-mvp.md) |
+| Prepare developer launch and outreach | [Launch kit](launch-kit.md) |
 
 ## Integration model
 
@@ -44,6 +46,7 @@ accepted.
 - [Database migrations](../MIGRATIONS.md)
 - [Security policy](../SECURITY.md)
 - [Changelog](../CHANGELOG.md)
+- [Owner actions](../OWNER_ACTIONS.md)
 
 Documentation bugs are product bugs. Use the
 [onboarding feedback form](https://github.com/andreyshedko/activity/issues/new?template=onboarding.yml)
