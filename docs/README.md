@@ -5,6 +5,9 @@ while keeping credentials and data in the host application.
 
 ## Start here
 
+Current maintainers and future agents should begin with the
+[project handoff](PROJECT_HANDOFF.md) before planning new product work.
+
 | Goal | Guide |
 |---|---|
 | Generate integration files | `npx @feedclip/activity init` |

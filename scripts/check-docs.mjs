@@ -15,6 +15,7 @@ const files = [
   "docs/headless.md",
   "docs/launch-kit.md",
   "docs/performance.md",
+  "docs/PROJECT_HANDOFF.md",
   "docs/reliability.md",
   "docs/troubleshooting.md",
   "docs/use-cases.md",
