@@ -9,6 +9,8 @@ follows [Semantic Versioning](https://semver.org/).
 
 - Added an evidence-based Activity Cloud MVP boundary, launch kit, outreach copy,
   weekly activation scorecard and explicit owner-action checklist.
+- Refreshed root, Next.js and StackBlitz lockfiles to resolve newly disclosed
+  `undici`, `nanoid` and `postcss` advisories.
 
 ## [0.9.0] - 2026-08-01
 
